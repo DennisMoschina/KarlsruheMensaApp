@@ -22,25 +22,44 @@ final class Repository {
     
     private let totalDaysToFetch = 10
     
+    /// Cache of normalized meal name -> image URL
+    private var imageCache: [String: URL] = [:]
+    private let imageCacheQueue = DispatchQueue(label: "Repository.imageCache")
+    
     init() {}
+    
+    
+    private struct RequestedDay {
+        let index: Int
+        let date: Date
+    }
+    
+    private struct MealDetails {
+        let apiMealID: String?
+        let name: String
+        let imageEntries: [FoodImageEntry]
+        let averageRating: Double?
+        let ratingsCount: Int
+        let personalRating: Int?
+    }
+    
+    private struct FetchChunk {
+        let weekDate: Date
+        let startDate: Date
+        let startIndex: Int
+        let daysToFetch: Int
+    }
     
     /// Loads menu data into the provided app state, reusing cached data when possible.
     func get(refetch: Bool = false, viewModel: ViewModel, dataSyncer: CanteenDataSyncing? = nil) {
-        func fetch() {
+        func fetchAll() {
             viewModel.loading = true
-            self.fetchCanteenData(for: viewModel.canteenSelection) { canteen in
-                viewModel.canteen = canteen
+            self.fetchCanteenData(viewModel: viewModel, resetImageCache: true) {
                 viewModel.loading = false
-#if os(iOS)
-                if let canteenData = viewModel.canteen {
-                    let priceGroup = viewModel.priceGroupSelection
-                    dataSyncer?.sendCanteenDataToWatch(canteen: canteenData, priceGroup: priceGroup)
-                }
-#endif
+                self.sendCanteenDataToWatchIfAvailable(viewModel: viewModel, dataSyncer: dataSyncer)
             }
         }
 
-        //if canteen is changed in settings
         if refetch {
             fetchAll()
             return
@@ -49,14 +68,14 @@ final class Repository {
         if let canteenData = viewModel.canteen {
             normalizeCachedCanteen(canteenData)
             
-            if canteenData.foodOnDayX.count < 7 {
-                fetch()
-            }
-            else {
-#if os(iOS)
-                let priceGroup = viewModel.priceGroupSelection
-                dataSyncer?.sendCanteenDataToWatch(canteen: canteenData, priceGroup: priceGroup)
-#endif
+            if (0..<totalDaysToFetch).contains(where: { canteenData.foodOnDayX[$0]?.isEmpty ?? true }) {
+                viewModel.loading = true
+                fetchCanteenData(viewModel: viewModel, updating: canteenData, resetImageCache: false) {
+                    viewModel.loading = false
+                    self.sendCanteenDataToWatchIfAvailable(viewModel: viewModel, dataSyncer: dataSyncer)
+                }
+            } else {
+                sendCanteenDataToWatchIfAvailable(viewModel: viewModel, dataSyncer: dataSyncer)
                 viewModel.loading = false
             }
         } else {
@@ -64,73 +83,88 @@ final class Repository {
         }
     }
     
-    private func fetchCanteenData(for canteenSelection: Canteens, completion: @escaping (Canteen) -> Void) {
-        let calendar = Calendar.current
-        let today = Date()
-        let currentWeekNumber = calendar.component(.weekOfYear, from: today)
-        
-        var remainingWorkingDays = 0
-        
-        switch calendar.component(.weekday, from: today) {
-        case 1:
-            remainingWorkingDays = 0
-        case 2:
-            remainingWorkingDays = 5
-        case 3:
-            remainingWorkingDays = 4
-        case 4:
-            remainingWorkingDays = 3
-        case 5:
-            remainingWorkingDays = 2
-        case 6:
-            remainingWorkingDays = 1
-        case 7:
-            remainingWorkingDays = 0
-        default:
-            remainingWorkingDays = 0
+    private func fetchCanteenData(
+        viewModel: ViewModel,
+        updating canteen: Canteen? = nil,
+        resetImageCache: Bool,
+        completion: @escaping () -> ()
+    ) {
+        let now = Date()
+        let requestedDates = getNextWorkingDays(date: now, count: totalDaysToFetch)
+        let requestedDays = requestedDates.enumerated().map {
+            RequestedDay(index: $0.offset, date: $0.element)
         }
         
-        let daysInUpcomingWeeks = totalDaysToFetch - remainingWorkingDays
-        
-        let canteen = Canteen(name: canteenSelection.rawValue, foodOnDayX: [:], dateOfLastFetching: Date())
-        let dispatchGroup = DispatchGroup()
-        
-        //this week
-        if (remainingWorkingDays > 0) {
-            dispatchGroup.enter()
-            parseCanteenDataFromWebsite(weekNumber: currentWeekNumber, canteenSelection: canteenSelection, daysToFetch: remainingWorkingDays, startIndex: 0) { foods in
-                canteen.foodOnDayX.merge(foods) { (_, new) in new }
-                dispatchGroup.leave()
+        fetchRequestedDays(requestedDays, canteenSelection: viewModel.canteenSelection, resetImageCache: resetImageCache) { foodMap in
+            DispatchQueue.main.async {
+                if let canteen {
+                    canteen.foodOnDayX.merge(foodMap) { _, new in new }
+                    canteen.dateOfLastFetching = now
+                    canteen.nextOpenDays = requestedDates
+                } else {
+                    let canteen = Canteen(
+                        name: viewModel.canteenSelection.rawValue,
+                        foodOnDayX: foodMap,
+                        dateOfLastFetching: now
+                    )
+                    canteen.nextOpenDays = requestedDates
+                    viewModel.canteen = canteen
+                }
+                completion()
             }
         }
-        
-        // next week
-        dispatchGroup.enter()
-        parseCanteenDataFromWebsite(weekNumber: currentWeekNumber + 1, canteenSelection: canteenSelection, daysToFetch: 5, startIndex: remainingWorkingDays) { foods in
-            canteen.foodOnDayX.merge(foods) { (_, new) in new }
-            dispatchGroup.leave()
+    }
+    
+    private func fetchRequestedDays(
+        _ requestedDays: [RequestedDay],
+        canteenSelection: Canteens,
+        resetImageCache: Bool,
+        completion: @escaping ([Int: [FoodLine]]) -> Void
+    ) {
+        guard !requestedDays.isEmpty else {
+            completion([:])
+            return
         }
         
-        // the week after next week, if today isn't Monday
-        let daysToFetch = daysInUpcomingWeeks - 5
-        let startIndex = remainingWorkingDays + 5
-        if (daysToFetch > 0) {
+        if resetImageCache {
+            clearImageCache()
+        }
+        
+        let dispatchGroup = DispatchGroup()
+        let mergeQueue = DispatchQueue(label: "Repository.fetchRequestedDays.merge")
+        var mergedFoodMap: [Int: [FoodLine]] = [:]
+        
+        for chunk in buildFetchChunks(for: requestedDays) {
             dispatchGroup.enter()
-            parseCanteenDataFromWebsite(weekNumber: currentWeekNumber + 2, canteenSelection: canteenSelection, daysToFetch: daysToFetch, startIndex: startIndex) { foods in
-                canteen.foodOnDayX.merge(foods) { (_, new) in new }
+            parseCanteenDataFromWebsite(
+                canteenSelection: canteenSelection,
+                weekDate: chunk.weekDate,
+                daysToFetch: chunk.daysToFetch,
+                startDate: chunk.startDate,
+                startIndex: chunk.startIndex
+            ) { foods in
+                mergeQueue.sync {
+                    mergedFoodMap.merge(foods) { _, new in new }
+                }
                 dispatchGroup.leave()
             }
         }
         
         dispatchGroup.notify(queue: .main) {
-            DispatchQueue.main.async {
-                completion(canteen)
-            }
+            completion(mergedFoodMap)
         }
     }
     
-    private func parseCanteenDataFromWebsite(weekNumber: Int, canteenSelection: Canteens, daysToFetch: Int, startIndex: Int, completion: @escaping ([Int: [FoodLine]]) -> Void) {
-        var foodOnDayX: [Int: [FoodLine]] = [:]
+    private func parseCanteenDataFromWebsite(
+        canteenSelection: Canteens,
+        weekDate: Date,
+        daysToFetch: Int,
+        startDate: Date,
+        startIndex: Int,
+        completion: @escaping ([Int: [FoodLine]]) -> Void
+    ) {
+        let calendar = Calendar.current
+        let weekNumber = calendar.component(.weekOfYear, from: weekDate)
         let url = getURL(weekNumber: weekNumber, canteen: canteenSelection)
         
         let task = URLSession.shared.dataTask(with: url) { (data, _, _) in
@@ -176,6 +210,7 @@ final class Repository {
                 startDate: startDate,
                 startIndex: startIndex,
                 calendar: calendar,
+                canteenSelection: canteenSelection,
                 completion: completion
             )
         }
@@ -300,6 +335,7 @@ final class Repository {
         startDate: Date,
         startIndex: Int,
         calendar: Calendar,
+        canteenSelection: Canteens,
         completion: @escaping ([Int: [FoodLine]]) -> Void
     ) {
         let dayIndicesToEnrich = foodOnDayX.keys.sorted().filter {
@@ -324,7 +360,7 @@ final class Repository {
             let dateString = dateFormatter.string(from: dateForDay)
             
             imageGroup.enter()
-            fetchMealDetailsForDay(date: dateString) { mealDetailsByLine in
+            fetchMealDetailsForDay(date: dateString, canteenSelection: canteenSelection) { mealDetailsByLine in
                 imageAssignmentQueue.async {
                     if var updatedFoodLines = enrichedFoodMap[dayIndex] {
                         self.applyMealDetails(mealDetailsByLine, to: &updatedFoodLines)
@@ -340,7 +376,7 @@ final class Repository {
         }
     }
     
-    private func fetchMealDetailsForDay(date: String, completion: @escaping ([String: [MealDetails]]) -> Void) {
+    private func fetchMealDetailsForDay(date: String, canteenSelection: Canteens, completion: @escaping ([String: [MealDetails]]) -> Void) {
         let query = """
         query GetMealPlanForDay($date: NaiveDate!) {\n  getCanteens {\n    id\n    name\n    lines {\n      id\n      name\n      meals(date: $date) {\n        id\n        name\n        ratings {\n          averageRating\n          ratingsCount\n          personalRating\n          __typename\n        }\n        images {\n          id\n          url\n          __typename\n        }\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n
 """
@@ -368,7 +404,7 @@ final class Repository {
                 return
             }
             
-            guard let selectedCanteen = self.selectedCanteen(from: canteens) else {
+            guard let selectedCanteen = self.selectedCanteen(from: canteens, canteenSelection: canteenSelection) else {
                 completion([:])
                 return
             }
@@ -379,8 +415,8 @@ final class Repository {
         task.resume()
     }
     
-    private func selectedCanteen(from canteens: [[String: Any]]) -> [String: Any]? {
-        let selectedCanteenName = normalizedMealName(ViewModel.shared.canteenSelection.rawValue)
+    private func selectedCanteen(from canteens: [[String: Any]], canteenSelection: Canteens) -> [String: Any]? {
+        let selectedCanteenName = normalizedMealName(canteenSelection.rawValue)
         return canteens.first(where: {
             guard let canteenName = $0["name"] as? String else { return false }
             return normalizedMealName(canteenName) == selectedCanteenName
@@ -602,17 +638,11 @@ final class Repository {
         return request
     }
     
-    private func sendCurrentCanteenToWatchIfAvailable() {
-        guard let canteenData = ViewModel.shared.canteen else { return }
-        let priceGroup = ViewModel.shared.priceGroupSelection
-        NotificationCenter.default.post(
-            name: .repositoryDidUpdateCanteenData,
-            object: self,
-            userInfo: [
-                "canteen": canteenData,
-                "priceGroup": priceGroup
-            ]
-        )
+    private func sendCanteenDataToWatchIfAvailable(viewModel: ViewModel, dataSyncer: CanteenDataSyncing?) {
+#if os(iOS)
+        guard let canteenData = viewModel.canteen else { return }
+        dataSyncer?.sendCanteenDataToWatch(canteen: canteenData, priceGroup: viewModel.priceGroupSelection)
+#endif
     }
     
     // Cached food is stored by relative working-day indices (`0` = first upcoming day at

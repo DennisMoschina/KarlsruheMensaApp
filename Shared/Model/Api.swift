@@ -2,6 +2,7 @@ import Foundation
 import CryptoKit
 
 let apiURL = URL(string: "https://api.mensa-ka.de/")!
+private let apiKey = ""
 
 private let apiClientIdentifierDefaultsKey = "mensa_api_client_identifier"
 

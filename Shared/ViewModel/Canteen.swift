@@ -15,7 +15,7 @@ final class Canteen: Codable {
     var name: String
     var foodOnDayX: [Int: [FoodLine]]
     var dateOfLastFetching: Date
-    var nextSevenWorkingDays: [Date]
+    var nextOpenDays: [Date]
     
     enum CodingKeys: String, CodingKey {
         case name
@@ -48,4 +48,3 @@ final class Canteen: Codable {
         try container.encode(nextOpenDays, forKey: .nextOpenDays)
     }
 }
-

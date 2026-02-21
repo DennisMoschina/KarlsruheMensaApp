@@ -9,7 +9,7 @@
 import Foundation
 import Observation
 
-/// Single menu item including labels, prices, and optional nutritional details.
+/// Single menu item including labels, prices, image metadata, and optional rating details.
 @Observable
 final class Food: Codable, Identifiable {
     var id = UUID()
@@ -21,7 +21,12 @@ final class Food: Codable, Identifiable {
     var foodClass: FoodClass
     var priceInfo: String
     var nutritionalInfo: NutritionalInfo?
-    
+    var imageURL: URL?
+    var imageEntries: [FoodImageEntry]
+    var averageRating: Double?
+    var ratingsCount: Int
+    var personalRating: Int?
+
     enum CodingKeys: String, CodingKey {
         case apiMealID
         case name
@@ -36,9 +41,23 @@ final class Food: Codable, Identifiable {
         case ratingsCount
         case personalRating
     }
-    
+
     /// Creates a regular menu item.
-    init(name: String, bio: Bool, allergens: [String], prices: [Float], foodClass: FoodClass, nutritionalInfo: NutritionalInfo?) {
+    init(
+        apiMealID: String? = nil,
+        name: String,
+        bio: Bool,
+        allergens: [String],
+        prices: [Float],
+        foodClass: FoodClass,
+        nutritionalInfo: NutritionalInfo?,
+        imageURL: URL? = nil,
+        imageEntries: [FoodImageEntry] = [],
+        averageRating: Double? = nil,
+        ratingsCount: Int = 0,
+        personalRating: Int? = nil
+    ) {
+        self.apiMealID = apiMealID
         self.name = name
         self.bio = bio
         self.allergens = allergens.flatMap { parseAllergens(from: $0) }
@@ -109,6 +128,7 @@ final class Food: Codable, Identifiable {
     }
 }
 
+/// Image metadata returned by the Mensa image API.
 struct FoodImageEntry: Codable, Identifiable {
     let id: String
     let url: URL
@@ -119,6 +139,7 @@ struct FoodImageEntry: Codable, Identifiable {
     var upvotes: Int?
 }
 
+/// Known allergen code with localized display labels.
 enum Allergen: String, Codable, CaseIterable, Hashable, Identifiable {
     case ca
     case di
