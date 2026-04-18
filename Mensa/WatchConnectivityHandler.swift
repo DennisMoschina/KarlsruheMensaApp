@@ -16,8 +16,17 @@ final class WatchConnectivityHandler: NSObject, CanteenDataSyncing {
     
     @ObservationIgnored
     var session = WCSession.default
+
+    @ObservationIgnored
+    private let viewModel: ViewModel
+
+    @ObservationIgnored
+    private let repository: Repository
     
-    override init() {
+    /// Creates a watch connectivity bridge that can serve canteen data requests.
+    init(viewModel: ViewModel, repository: Repository) {
+        self.viewModel = viewModel
+        self.repository = repository
         super.init()
         self.session.delegate = self
         if session.activationState != .activated {
@@ -57,13 +66,8 @@ final class WatchConnectivityHandler: NSObject, CanteenDataSyncing {
         }
     }
     
-    @objc private func handleRepositoryCanteenUpdate(_ notification: Notification) {
-        guard let userInfo = notification.userInfo,
-              let canteen = userInfo["canteen"] as? Canteen,
-              let priceGroup = userInfo["priceGroup"] as? Int else {
-            return
-        }
-        sendCanteenDataToWatch(canteen: canteen, priceGroup: priceGroup)
+    private func refreshAndSendCanteenDataToWatch() {
+        repository.get(viewModel: viewModel, dataSyncer: self)
     }
 }
 
@@ -89,7 +93,7 @@ extension WatchConnectivityHandler: WCSessionDelegate {
     func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
         if let requestCanteenData = message["requestCanteenData"] as? Bool, requestCanteenData {
             DispatchQueue.main.async {
-                Repository.shared.get(refetch: false)
+                self.refreshAndSendCanteenDataToWatch()
             }
         }
     }
@@ -97,7 +101,7 @@ extension WatchConnectivityHandler: WCSessionDelegate {
     func session(_ session: WCSession, didReceiveUserInfo userInfo: [String : Any] = [:]) {
         if let requestCanteenData = userInfo["requestCanteenData"] as? Bool, requestCanteenData {
             DispatchQueue.main.async {
-                Repository.shared.get(refetch: false)
+                self.refreshAndSendCanteenDataToWatch()
             }
         }
     }

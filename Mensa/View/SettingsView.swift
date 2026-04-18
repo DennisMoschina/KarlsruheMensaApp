@@ -149,8 +149,12 @@ struct AllergenFilterListView: View {
 
 struct SettingsView_Previews: PreviewProvider {
     static var previews: some View {
+        let viewModel = ViewModel()
+        let repository = Repository()
+
         SettingsView()
-            .environment(ViewModel())
-            .environment(WatchConnectivityHandler())
+            .environment(viewModel)
+            .environment(WatchConnectivityHandler(viewModel: viewModel, repository: repository))
+            .environment(\.repository, repository)
     }
 }

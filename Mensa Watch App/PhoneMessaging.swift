@@ -58,36 +58,54 @@ extension PhoneMessaging: WCSessionDelegate {
     
     //when app is running on watch as well as on phone -> immediate ui change on watch, if canteen changes on phone
     func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
-        if let newCanteenSelection = message["canteenSelection"] as? Int {
-            self.canteenSelection = newCanteenSelection
-            UserDefaults.standard.set(newCanteenSelection, forKey: Constants.KEY_CHOSEN_CANTEEN)
-            print("updated canteen selection!")
-            print("new selection: \(newCanteenSelection)")
-        }
-        
-        if let canteenData = message["canteen"] as? Data {
-            do {
-                let canteen = try JSONDecoder().decode(Canteen.self, from: canteenData)
-                viewModel.canteen = canteen
-            } catch {
-                print("Failed to decode canteen data: \(error)")
+        DispatchQueue.main.async {
+            if let newCanteenSelection = message["canteenSelection"] as? Int {
+                self.canteenSelection = newCanteenSelection
+                UserDefaults.standard.set(newCanteenSelection, forKey: Constants.KEY_CHOSEN_CANTEEN)
+                print("updated canteen selection!")
+                print("new selection: \(newCanteenSelection)")
+            }
+            
+            if let canteenData = message["canteen"] as? Data {
+                do {
+                    let canteen = try JSONDecoder().decode(Canteen.self, from: canteenData)
+                    self.viewModel.canteen = canteen
+                } catch {
+                    print("Failed to decode canteen data: \(error)")
+                }
+            }
+            
+            if let newPriceGroup = message["priceGroup"] as? Int {
+                self.priceGroup = newPriceGroup
+                UserDefaults.standard.set(newPriceGroup, forKey: Constants.KEY_CHOSEN_PRICE_GROUP)
+                print("updated price group!")
+                print("new selection: \(newPriceGroup)")
             }
         }
     }
     
     //when watch app is not running
     func session(_ session: WCSession, didReceiveUserInfo userInfo: [String : Any] = [:]) {
-        if let newCanteenSelection = userInfo["canteenSelection"] as? Int {
-            UserDefaults.standard.set(newCanteenSelection, forKey: Constants.KEY_CHOSEN_CANTEEN)
-            self.canteenSelection = newCanteenSelection
-        }
-        
-        if let canteenData = userInfo["canteen"] as? Data {
-            do {
-                let canteen = try JSONDecoder().decode(Canteen.self, from: canteenData)
-                viewModel.canteen = canteen
-            } catch {
-                print("Failed to decode canteen data: \(error)")
+        DispatchQueue.main.async {
+            if let newCanteenSelection = userInfo["canteenSelection"] as? Int {
+                UserDefaults.standard.set(newCanteenSelection, forKey: Constants.KEY_CHOSEN_CANTEEN)
+                self.canteenSelection = newCanteenSelection
+            }
+            
+            if let canteenData = userInfo["canteen"] as? Data {
+                do {
+                    let canteen = try JSONDecoder().decode(Canteen.self, from: canteenData)
+                    self.viewModel.canteen = canteen
+                } catch {
+                    print("Failed to decode canteen data: \(error)")
+                }
+            }
+            
+            if let newPriceGroup = userInfo["priceGroup"] as? Int {
+                self.priceGroup = newPriceGroup
+                UserDefaults.standard.set(newPriceGroup, forKey: Constants.KEY_CHOSEN_PRICE_GROUP)
+                print("updated price group!")
+                print("new selection: \(newPriceGroup)")
             }
         }
     }

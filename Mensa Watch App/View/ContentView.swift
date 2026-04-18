@@ -43,7 +43,7 @@ struct ContentView: View {
         .navigationTitle(Text(getTitleBarString(daySelection: Int(self.daySelection))))
         .accentColor(Color.green)
         .onAppear {
-            repository.get(viewModel: viewModel)
+            phoneMessaging.requestCanteenDataFromPhone()
         }
         .onLongPressGesture {
             showDatePicker = !showDatePicker;

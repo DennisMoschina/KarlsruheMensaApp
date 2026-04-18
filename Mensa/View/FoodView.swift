@@ -71,8 +71,12 @@ struct FoodView: View {
 
 struct FoodView_Previews: PreviewProvider {
     static var previews: some View {
+        let viewModel = ViewModel()
+        let repository = Repository()
+
         FoodView(day: 0)
-            .environment(ViewModel())
-            .environment(WatchConnectivityHandler())
+            .environment(viewModel)
+            .environment(WatchConnectivityHandler(viewModel: viewModel, repository: repository))
+            .environment(\.repository, repository)
     }
 }
