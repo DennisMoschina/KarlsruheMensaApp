@@ -167,6 +167,10 @@ func removeUnwantedFood(foods: [Food], settings: ViewModel) -> [Food] {
     var result = [Food]()
 
     for food in foods {
+        if !settings.excludedAllergens.isDisjoint(with: Set(food.allergens)) {
+            continue
+        }
+
         switch food.foodClass {
             case .vegetarian:
                 if (!settings.onlyVegan) {result.append(food)}

@@ -12,13 +12,12 @@ import UIKit
 #endif
 
 struct DetailedFoodView: View {
-    @ObservedObject var food: Food
+    let food: Food
+    @Environment(\.repository) private var repository
     @State private var uploadInProgress = false
     @State private var ratingInProgress = false
     @State private var feedbackMessage: String?
     @State private var showRatingSheet = false
-    @State private var selectedImageIndex = 0
-    @GestureState private var imageDragOffset: CGFloat = 0
 #if os(iOS)
     @State private var showImageSourceDialog = false
     @State private var showImagePicker = false
@@ -30,13 +29,8 @@ struct DetailedFoodView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     foodHeader
-                        .padding(.top, 5)
-                        .padding(.horizontal, 5)
-                    foodImage
-                        .padding(.vertical, 5)
-                        .padding(.horizontal, 5)
-                    ratingsSection
-                        .padding(.horizontal, 10)
+                    foodImage.padding(.horizontal, 10)
+                    ratingsSection.padding(.horizontal, 10)
                     if food.nutritionalInfo != nil {
                         sectionCard(title: NSLocalizedString("Nutritional Information", comment: "Nutrition section title")) {
                             NutritionalInfoView(food: food)
@@ -109,122 +103,24 @@ struct DetailedFoodView: View {
 
     private var foodHeader: some View {
         HStack {
-            foodTitleText
+            Text(food.name)
+                .font(.title2.weight(.semibold))
+                .foregroundStyle(.primary)
                 .fixedSize(horizontal: false, vertical: true)
             Spacer(minLength: 0)
         }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
         .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    private var foodTitleText: Text {
-        let baseText = Text(food.name)
-            .font(.title2.weight(.semibold))
-            .foregroundColor(.primary)
-
-        guard food.foodClass != .nothing else {
-            return baseText
-        }
-
-        let foodClassLabel = NSLocalizedString(String(describing: food.foodClass), comment: Constants.EMPTY)
-
-        return baseText + Text("  (\(foodClassLabel))")
-            .font(.subheadline)
-            .italic()
-            .foregroundColor(.secondary)
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
     
     private var foodImage: some View {
         Group {
-            if !foodImages.isEmpty {
-                VStack(spacing: 8) {
-                    GeometryReader { geometry in
-                        let pageSize = geometry.size
-
-                        HStack(spacing: 0) {
-                            ForEach(foodImages) { imageEntry in
-                                CachedMealHeroImageView(
-                                    url: imageEntry.url,
-                                    placeholder: placeholderImage,
-                                    size: pageSize
-                                )
-                                .frame(width: pageSize.width, height: pageSize.height)
-                                .clipped()
-                            }
-                        }
-                        .offset(x: -CGFloat(selectedImageIndex) * pageSize.width + imageDragOffset)
-                        .animation(.interactiveSpring(response: 0.32, dampingFraction: 0.9), value: selectedImageIndex)
-                        .gesture(imageDragGesture(pageWidth: pageSize.width))
-                    }
-                    .frame(height: 263)
-                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                    .clipped()
-
-                    if foodImages.count > 1 {
-                        HStack(spacing: 6) {
-                            ForEach(foodImages.indices, id: \.self) { index in
-                                Circle()
-                                    .fill(index == selectedImageIndex ? Color.primary.opacity(0.75) : Color.secondary.opacity(0.35))
-                                    .frame(width: 6, height: 6)
-                            }
-                        }
-                        .frame(maxWidth: .infinity)
-                    }
-                }
+            if let imageURL = food.imageURL {
+                CachedMealHeroImageView(url: imageURL, placeholder: placeholderImage)
             }
         }
-        .onChange(of: foodImages.count) { newCount in
-            selectedImageIndex = min(selectedImageIndex, max(0, newCount - 1))
-        }
-    }
-
-    private func imageDragGesture(pageWidth: CGFloat) -> some Gesture {
-        DragGesture(minimumDistance: 12, coordinateSpace: .local)
-            .updating($imageDragOffset) { value, state, _ in
-                guard abs(value.translation.width) > abs(value.translation.height) else {
-                    state = 0
-                    return
-                }
-                state = boundedImageDragOffset(value.translation.width, pageWidth: pageWidth)
-            }
-            .onEnded { value in
-                guard foodImages.count > 1,
-                      pageWidth > 0,
-                      abs(value.translation.width) > abs(value.translation.height) else {
-                    return
-                }
-
-                let predictedOffset = value.predictedEndTranslation.width
-                let threshold = pageWidth * 0.22
-                if predictedOffset < -threshold {
-                    selectedImageIndex = min(selectedImageIndex + 1, foodImages.count - 1)
-                } else if predictedOffset > threshold {
-                    selectedImageIndex = max(selectedImageIndex - 1, 0)
-                }
-            }
-    }
-
-    private func boundedImageDragOffset(_ offset: CGFloat, pageWidth: CGFloat) -> CGFloat {
-        if foodImages.count <= 1 {
-            return 0
-        }
-        if selectedImageIndex == 0 && offset > 0 {
-            return min(offset, pageWidth * 0.18)
-        }
-        if selectedImageIndex == foodImages.count - 1 && offset < 0 {
-            return max(offset, -pageWidth * 0.18)
-        }
-        return offset
-    }
-
-    private var foodImages: [FoodImageEntry] {
-        let entries = food.imageEntries
-        if !entries.isEmpty {
-            return entries
-        }
-        if let imageURL = food.imageURL {
-            return [FoodImageEntry(id: imageURL.absoluteString, url: imageURL, rank: nil, personalDownvote: nil, personalUpvote: nil, downvotes: nil, upvotes: nil)]
-        }
-        return []
     }
     
     private var placeholderImage: some View {
@@ -263,6 +159,7 @@ struct DetailedFoodView: View {
                     }
                     .foregroundStyle(.secondary)
                 }
+                //Spacer()
             }
             .font(.subheadline)
         }
@@ -314,7 +211,7 @@ struct DetailedFoodView: View {
     
     private func rateMeal(_ rating: Int) {
         ratingInProgress = true
-        Repository.shared.rateMeal(food, rating: rating) { success in
+        repository.rateMeal(food, rating: rating) { success in
             ratingInProgress = false
             if success {
                 food.personalRating = rating
@@ -327,7 +224,7 @@ struct DetailedFoodView: View {
 
     private func uploadImageData(_ data: Data) {
         uploadInProgress = true
-        Repository.shared.uploadImage(food: food, imageData: data) { success in
+        repository.uploadImage(food: food, imageData: data) { success in
             uploadInProgress = false
             feedbackMessage = success
                 ? NSLocalizedString("Image uploaded.", comment: "Upload success message")
@@ -375,13 +272,11 @@ struct DetailedFoodView: View {
 private struct CachedMealHeroImageView<Placeholder: View>: View {
     let url: URL
     let placeholder: Placeholder
-    let size: CGSize
     @StateObject private var loader: CachedMealImageLoader
 
-    init(url: URL, placeholder: Placeholder, size: CGSize) {
+    init(url: URL, placeholder: Placeholder) {
         self.url = url
         self.placeholder = placeholder
-        self.size = size
         _loader = StateObject(wrappedValue: CachedMealImageLoader(url: url))
     }
     
@@ -391,13 +286,13 @@ private struct CachedMealHeroImageView<Placeholder: View>: View {
                 Image(uiImage: image)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
-                    .frame(width: size.width, height: size.height)
+                    .frame(maxWidth: .infinity, minHeight: 220, maxHeight: 280)
                     .clipped()
             } else {
                 placeholder
-                    .frame(width: size.width, height: size.height)
             }
         }
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
         .onAppear {
             loader.loadIfNeeded()
         }
@@ -500,37 +395,19 @@ private struct ImagePicker: UIViewControllerRepresentable {
 }
 #endif
 
-private struct DetailedFoodSheetPreview: View {
-    @State private var selectedFood: Food?
-
-    private let previewFood = Food(
-        name: "Beispielessen mit extrem langer Beschreibung und zusätzlich sogar noch Salat",
-        bio: true,
-        allergens: ["ML", "SE", "WE"],
-        prices: [4.60, 5.20, 4.00, 3.60],
-        foodClass: .vegetarian,
-        nutritionalInfo: NutritionalInfo(energy: "744", proteins: "41", carbohydrates: "94", sugar: "1", fat: "20", saturatedFat: "9", salt: "1", co2Value: "1109", co2Score: 2, waterValue: "29180", waterScore: 3, animalWelfareScore: 1, rainforestScore: 1, environmentScore: 1),
-        imageURL: apiURL.appending(path: "image/81f51fb2-1fdb-42c4-8ff3-7b5d2edd8779.jpg"),
-        averageRating: 3.8,
-        ratingsCount: 42,
-        personalRating: 4
-    )
-
-    var body: some View {
-        Color(.systemGroupedBackground)
-            .ignoresSafeArea()
-            .sheet(item: $selectedFood) { food in
-                DetailedFoodView(food: food)
-#if os(iOS)
-                    .presentationContentInteraction(.resizes)
-#endif
-            }
-            .onAppear {
-                selectedFood = previewFood
-            }
-    }
-}
 #Preview {
-    DetailedFoodSheetPreview()
+    DetailedFoodView(
+        food: Food(
+            name: "Beispielessen mit extrem langer Beschreibung und zusätzlich sogar noch Salat",
+            bio: true,
+            allergens: ["ML", "SE", "WE"],
+            prices: [4.60, 5.20, 4.00, 3.60],
+            foodClass: .vegetarian,
+            nutritionalInfo: NutritionalInfo(energy: "744", proteins: "41", carbohydrates: "94", sugar: "1", fat: "20", saturatedFat: "9", salt: "1", co2Value: "1109", co2Score: 2, waterValue: "29180", waterScore: 3, animalWelfareScore: 1, rainforestScore: 1, environmentScore: 1),
+            imageURL: apiURL.appending(path: "image/81f51fb2-1fdb-42c4-8ff3-7b5d2edd8779.jpg"),
+            averageRating: 3.8,
+            ratingsCount: 42,
+            personalRating: 4
+        )
+    )
 }
-

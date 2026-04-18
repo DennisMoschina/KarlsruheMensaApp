@@ -92,6 +92,21 @@ final class ViewModel {
     }
     
     var canteen: Canteen? = nil
+
+    var excludedAllergenCodes: [String] {
+        didSet {
+            let normalized = Array(Set(excludedAllergenCodes.map { $0.lowercased() })).sorted()
+            if normalized != excludedAllergenCodes {
+                excludedAllergenCodes = normalized
+                return
+            }
+            UserDefaults.standard.set(normalized, forKey: "excludedAllergens")
+        }
+    }
+    
+    var excludedAllergens: Set<Allergen> {
+        Set(excludedAllergenCodes.compactMap { Allergen.from(rawCode: $0) })
+    }
     
     /// Returns whether menu data still needs to be loaded.
     func areCanteensNil() -> Bool {

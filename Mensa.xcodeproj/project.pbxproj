@@ -23,7 +23,7 @@
 		1721F237290AC2FF006CE686 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1721F236290AC2FF006CE686 /* ContentView.swift */; };
 		1721F239290AC302006CE686 /* WatchFoodView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1721F238290AC302006CE686 /* WatchFoodView.swift */; };
 		1721F23B290AC304006CE686 /* ContextMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1721F23A290AC304006CE686 /* ContextMenuView.swift */; };
-		1718C18C2F3648D200540518 /* ImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1718C18B2F3648D200540518 /* ImageView.swift */; };
+		1718C18C2F3648D200540518 /* DetailedFoodView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1718C18B2F3648D200540518 /* DetailedFoodView.swift */; };
 		174A036C290AD37700E925AC /* Mensa Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 1721F210290AC0FC006CE686 /* Mensa Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		17582371243B4B4B00465652 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17582370243B4B4B00465652 /* Extensions.swift */; };
 		175A378E290ACAA500EFEA60 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 17731B1724434E0200D2E688 /* Localizable.strings */; };
@@ -96,7 +96,7 @@
 		1721F236290AC2FF006CE686 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		1721F238290AC302006CE686 /* WatchFoodView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchFoodView.swift; sourceTree = "<group>"; };
 		1721F23A290AC304006CE686 /* ContextMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextMenuView.swift; sourceTree = "<group>"; };
-		1718C18B2F3648D200540518 /* ImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageView.swift; sourceTree = "<group>"; };
+		1718C18B2F3648D200540518 /* DetailedFoodView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailedFoodView.swift; sourceTree = "<group>"; };
 		17582370243B4B4B00465652 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		175A3793290AD10A00EFEA60 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		176EEDC02F2E9B5F00AE6423 /* Api.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Api.swift; sourceTree = "<group>"; };
@@ -230,7 +230,7 @@
 				179399AD24449157003A2925 /* SwipeView.swift */,
 				179399AC24449157003A2925 /* SettingsView.swift */,
 				179118F92A0FF78D00A5740B /* NutritionalInfoView.swift */,
-				1718C18B2F3648D200540518 /* ImageView.swift */,
+				1718C18B2F3648D200540518 /* DetailedFoodView.swift */,
 				179399AE24449157003A2925 /* TitleBarView.swift */,
 			);
 			path = View;
@@ -461,7 +461,7 @@
 				179399B224449157003A2925 /* SettingsView.swift in Sources */,
 				17FEA0DE2A0B9BE700A2296C /* Utilities.swift in Sources */,
 				17BD30622A0E3BCB00A76CD6 /* ViewModel.swift in Sources */,
-				1718C18C2F3648D200540518 /* ImageView.swift in Sources */,
+				1718C18C2F3648D200540518 /* DetailedFoodView.swift in Sources */,
 				177174BA237F0896003C0C53 /* Repository.swift in Sources */,
 				179399B124449157003A2925 /* ContentView.swift in Sources */,
 				17582371243B4B4B00465652 /* Extensions.swift in Sources */,

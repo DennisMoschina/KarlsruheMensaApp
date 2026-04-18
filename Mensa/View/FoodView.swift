@@ -24,19 +24,24 @@ struct FoodView: View {
             let closedFoodLines = foodLines.filter { $0.closingText != Constants.EMPTY || $0.foods.isEmpty }
             
             ForEach(openFoodLines) { foodLine in
-                let foods = removeExcludedFood(food: foodLine.foods)
+                let foods = removeUnwantedFood(foods: foodLine.foods, settings: viewModel)
 
                 if (!foods.isEmpty) {
                     Section(header: Text(foodLine.name)) {
                         ForEach(foods, id: \.name) { food in
-                            FoodRow(
-                                food: food,
-                                priceGroup: self.$viewModel.priceGroupSelection,
-                                onTap: {
-                                    self.onFoodSelected?(food)
-                                }
-                            )
+                            FoodRow(food: food, priceGroup: self.$viewModel.priceGroupSelection) {
+                                selectedFood = food
+                            }
                         }
+                        .padding(.bottom, 5)
+                    }
+                }
+            }
+            
+            ForEach(closedFoodLines) { foodLine in
+                if foodLine.foods.isEmpty {
+                    Section(header: Text(foodLine.name + Constants.DASH + Constants.FOOD_LINE_CLOSED)) {
+                        ClosedRow(info: Constants.DASH)
                     }
                 }
             }
@@ -47,15 +52,8 @@ struct FoodView: View {
                         ClosedRow(info: Constants.DASH)
                     }
                 } else {
-                    let foods = removeUnwantedFood(foods: foodLine.foods, settings: viewModel)
-
-                    if (!foods.isEmpty) {
-                        Section(header: Text(foodLine.name)) {
-                            ForEach(foods, id: \.name) { food in
-                                FoodRow(food: food, priceGroup: $viewModel.priceGroupSelection)
-                            }
-                            .padding(.bottom, 5)
-                        }
+                    Section(header: Text(foodLine.name)) {
+                        ClosedRow(info: foodLine.closingText)
                     }
                 }
             }
@@ -63,6 +61,9 @@ struct FoodView: View {
         .refreshable {
             viewModel.loading = true
             repository.get(viewModel: viewModel, dataSyncer: watchConnectivity)
+        }
+        .sheet(item: $selectedFood) { food in
+            DetailedFoodView(food: food)
         }
     }
 }

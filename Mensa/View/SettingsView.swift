@@ -103,7 +103,7 @@ struct SettingsView: View {
 }
 
 struct AllergenFilterListView: View {
-    @ObservedObject var viewModel = ViewModel.shared
+    @Environment(ViewModel.self) private var viewModel
     
     var body: some View {
         List {
