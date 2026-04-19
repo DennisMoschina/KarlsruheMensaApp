@@ -13,7 +13,9 @@ struct FoodView: View {
     @Environment(WatchConnectivityHandler.self) private var watchConnectivity
     @Environment(\.repository) private var repository
     var day: Int
-    var onFoodSelected: ((Food) -> Void)? = nil
+    var onDetailPresentationChange: ((Bool) -> Void)? = nil
+    
+    @State private var selectedFood: Food? = nil
     
     var body: some View {
         @Bindable var viewModel = viewModel
@@ -29,11 +31,15 @@ struct FoodView: View {
                 if (!foods.isEmpty) {
                     Section(header: Text(foodLine.name)) {
                         ForEach(foods, id: \.name) { food in
-                            FoodRow(food: food, priceGroup: self.$viewModel.priceGroupSelection) {
-                                selectedFood = food
-                            }
+                            FoodRow(
+                                food: food,
+                                priceGroup: self.$viewModel.priceGroupSelection,
+                                onTap: {
+                                    self.selectedFood = food
+                                    self.onDetailPresentationChange?(true)
+                                }
+                            )
                         }
-                        .padding(.bottom, 5)
                     }
                 }
             }
@@ -64,6 +70,12 @@ struct FoodView: View {
         }
         .sheet(item: $selectedFood) { food in
             DetailedFoodView(food: food)
+#if os(iOS)
+                .presentationContentInteraction(.resizes)
+#endif
+        }
+        .onChange(of: selectedFood?.id) { _ in
+            onDetailPresentationChange?(selectedFood != nil)
         }
     }
 }

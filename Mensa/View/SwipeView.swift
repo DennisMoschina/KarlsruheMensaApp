@@ -16,17 +16,40 @@ import SwiftUI
 struct SwipeView: View {
 
     @Binding var daySelection: Int
-    
-    let days = 0..<7
+    private let dayRange = 0..<Constants.DAYS_PER_WEEK
+    @State private var isShowingDetailSheet = false
+
+    @ViewBuilder
+    private var pagerContent: some View {
+        TabView(selection: self.$daySelection) {
+            ForEach(self.dayRange, id: \.self) { day in
+                ZStack {
+                    FoodView(
+                        day: day,
+                        onDetailPresentationChange: { isPresented in
+                            self.isShowingDetailSheet = isPresented
+                        }
+                    )
+                    .tag(day)
+                }
+            }
+        }
+    }
         
     var body: some View {
-        TabView(selection: $daySelection) {
-            ForEach(days, id: \.self) { day in
-                FoodView(day: day)
-                    .tag(day)
+        Group {
+            if isShowingDetailSheet {
+                pagerContent
+            } else {
+                pagerContent
             }
         }
         .tabViewStyle(.page(indexDisplayMode: .never))
+        .animation(.interactiveSpring(response: 0.35, dampingFraction: 0.92), value: self.daySelection)
+        .onChange(of: self.daySelection) { newSelection in
+            self.daySelection = max(self.dayRange.lowerBound, min(newSelection, self.dayRange.upperBound - 1))
+        }
+        .ignoresSafeArea(edges: .bottom)
     }
 }
 
