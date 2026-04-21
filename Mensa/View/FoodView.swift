@@ -10,12 +10,8 @@ import SwiftUI
  
 struct FoodView: View {
     @Environment(ViewModel.self) private var viewModel
-    @Environment(WatchConnectivityHandler.self) private var watchConnectivity
-    @Environment(\.repository) private var repository
     var day: Int
-    var onDetailPresentationChange: ((Bool) -> Void)? = nil
-    
-    @State private var selectedFood: Food? = nil
+    var onFoodSelected: ((Food) -> Void)? = nil
     
     var body: some View {
         @Bindable var viewModel = viewModel
@@ -33,10 +29,9 @@ struct FoodView: View {
                         ForEach(foods, id: \.name) { food in
                             FoodRow(
                                 food: food,
-                                priceGroup: self.$viewModel.priceGroupSelection,
+                                priceGroup: $viewModel.priceGroupSelection,
                                 onTap: {
-                                    self.selectedFood = food
-                                    self.onDetailPresentationChange?(true)
+                                    self.onFoodSelected?(food)
                                 }
                             )
                         }
@@ -63,19 +58,6 @@ struct FoodView: View {
                     }
                 }
             }
-        }
-        .refreshable {
-            viewModel.loading = true
-            repository.get(viewModel: viewModel, dataSyncer: watchConnectivity)
-        }
-        .sheet(item: $selectedFood) { food in
-            DetailedFoodView(food: food)
-#if os(iOS)
-                .presentationContentInteraction(.resizes)
-#endif
-        }
-        .onChange(of: selectedFood?.id) { _ in
-            onDetailPresentationChange?(selectedFood != nil)
         }
     }
 }

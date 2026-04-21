@@ -33,7 +33,8 @@ final class PhoneMessaging: NSObject {
         self.canteenSelection = UserDefaults.standard.integer(forKey: Constants.KEY_CHOSEN_CANTEEN)
         self.priceGroup = UserDefaults.standard.integer(forKey: Constants.KEY_CHOSEN_PRICE_GROUP)
     }
-    
+
+    /// Requests the latest canteen payload from the paired iPhone.
     func requestCanteenDataFromPhone() {
         guard self.session.activationState == .activated else { return }
         if self.session.isReachable {
