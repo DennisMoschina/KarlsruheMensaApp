@@ -9,36 +9,36 @@
 import SwiftUI
 
 struct ContentView: View {
-    
+    @State var showSettings: Bool = false
     @State var daySelection = 0
+    
     @ObservedObject var viewModel = ViewModel.shared
     @EnvironmentObject private var watchConnectivity: WatchConnectivityHandler
     
     var body: some View {
-        ZStack {
-            Color(.systemBackground).ignoresSafeArea()
-            VStack (spacing: 0) {
-                ZStack {
-                    Color.gray.edgesIgnoringSafeArea(.all).opacity(0.1)
-                    VStack {
-                        TitleBarView()
-                            .padding(.bottom, 10)
-                            .padding(.top, 10)
-                        
-                        WeekDaysView(selection: self.$daySelection)
-                            .padding(.leading, 10)
-                            .padding(.trailing, 10)
-                    }
-                    .padding(.bottom, 0)
-                }
-                .frame(height: 156)
-                
+        NavigationStack {
+            VStack(spacing: 0) {
+                WeekDaysView(selection: self.$daySelection)
+                    .padding(.bottom)
+                    .background(Color(uiColor: .systemGroupedBackground))
                 Divider()
                 
                 ZStack {
                     SwipeView(daySelection: self.$daySelection).blur(radius: self.viewModel.loading ? 3 : 0)
                     
                     if (self.viewModel.loading) {ProgressView().progressViewStyle(CircularProgressViewStyle())}
+                }
+            }
+            .sheet(isPresented: self.$showSettings) {
+                SettingsView().accentColor(Constants.COLOR_ACCENT)
+            }
+            .navigationTitle(Text(self.viewModel.canteenSelection.rawValue))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem {
+                    Button("settings", systemImage: Constants.IMAGE_SETTINGS) {
+                        self.showSettings.toggle()
+                    }
                 }
             }
         }

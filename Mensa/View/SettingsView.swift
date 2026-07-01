@@ -9,6 +9,7 @@
 import SwiftUI
 
 struct SettingsView: View {
+    @Environment(\.dismiss) private var dismiss
 
     @ObservedObject var viewModel = ViewModel.shared
     @StateObject var watchConnectivity = WatchConnectivityHandler.shared
@@ -78,7 +79,7 @@ struct SettingsView: View {
             }
             .navigationBarTitle(Text("Settings"), displayMode: .inline)
             .navigationBarItems(trailing: Button(action: {
-                self.viewModel.showSettings = false
+                self.dismiss()
             }) {
                 Text(Constants.DONE).bold().foregroundColor(self.accentColor)
             })

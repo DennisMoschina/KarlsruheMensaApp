@@ -45,7 +45,6 @@
 		179399B124449157003A2925 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 179399AB24449157003A2925 /* ContentView.swift */; };
 		179399B224449157003A2925 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 179399AC24449157003A2925 /* SettingsView.swift */; };
 		179399B324449157003A2925 /* SwipeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 179399AD24449157003A2925 /* SwipeView.swift */; };
-		179399B424449157003A2925 /* TitleBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 179399AE24449157003A2925 /* TitleBarView.swift */; };
 		17BD30622A0E3BCB00A76CD6 /* ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17BD30612A0E3BCB00A76CD6 /* ViewModel.swift */; };
 		17BD30632A0E3BCB00A76CD6 /* ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17BD30612A0E3BCB00A76CD6 /* ViewModel.swift */; };
 		17C0E0012F39BC1200B1A001 /* Credentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17C0E0002F39BC1200B1A001 /* Credentials.swift */; };
@@ -115,7 +114,6 @@
 		179399AB24449157003A2925 /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		179399AC24449157003A2925 /* SettingsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		179399AD24449157003A2925 /* SwipeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeView.swift; sourceTree = "<group>"; };
-		179399AE24449157003A2925 /* TitleBarView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TitleBarView.swift; sourceTree = "<group>"; };
 		17BD30612A0E3BCB00A76CD6 /* ViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModel.swift; sourceTree = "<group>"; };
 		17C0E0002F39BC1200B1A001 /* Credentials.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Credentials.swift; sourceTree = "<group>"; };
 		17FEA0DD2A0B9BE700A2296C /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
@@ -224,7 +222,6 @@
 				179399AA24449157003A2925 /* WeekDaysView.swift */,
 				179399AD24449157003A2925 /* SwipeView.swift */,
 				179399AC24449157003A2925 /* SettingsView.swift */,
-				179399AE24449157003A2925 /* TitleBarView.swift */,
 				179118F92A0FF78D00A5740B /* NutritionalInfoView.swift */,
 			);
 			path = View;
@@ -460,9 +457,6 @@
 				177174BE237F0C2C003C0C53 /* FoodLine.swift in Sources */,
 				179118F42A0FE1C500A5740B /* NutritionalInfo.swift in Sources */,
 				179118F72A0FF4F800A5740B /* FoodRow.swift in Sources */,
-				176EEDC12F2E9B5F00AE6423 /* Api.swift in Sources */,
-				17C0E0012F39BC1200B1A001 /* Credentials.swift in Sources */,
-				179399B424449157003A2925 /* TitleBarView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -690,7 +684,7 @@
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = Mensa/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.food-and-drink";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -702,7 +696,7 @@
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
 				SUPPORTS_MACCATALYST = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,6";
+				TARGETED_DEVICE_FAMILY = "1,2,6,7";
 			};
 			name = Debug;
 		};
@@ -720,7 +714,7 @@
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = Mensa/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.food-and-drink";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
