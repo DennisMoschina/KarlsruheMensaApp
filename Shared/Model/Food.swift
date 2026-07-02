@@ -21,7 +21,6 @@ final class Food: Codable, Identifiable {
     var foodClass: FoodClass
     var priceInfo: String
     var nutritionalInfo: NutritionalInfo?
-    var showNutritionalInfo = false
     
     enum CodingKeys: String, CodingKey {
         case apiMealID

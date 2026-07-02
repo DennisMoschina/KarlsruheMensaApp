@@ -12,13 +12,9 @@ import UIKit
 #endif
 
 struct FoodRow: View {
-    @Bindable var food: Food
+    let food: Food
     @Binding var priceGroup: Int
-    var onTap: (() -> Void)? = nil
-
-    private var isClosedFood: Bool {
-        food.name.localizedCaseInsensitiveContains("geschlossen")
-    }
+    @State private var isShowingNutritionalInfo = false
     
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
@@ -26,24 +22,33 @@ struct FoodRow: View {
             if !isClosedFood {
                 CachedMealCardImageView(url: food.imageURL)
             }
-#endif
-
-            VStack(alignment: .leading, spacing: 6) {
-                Text(food.name)
-                    .fixedSize(horizontal: false, vertical: true)
-
-                if !isClosedFood {
-                    HStack(spacing: 8) {
-                        HStack(spacing: 6) {
-                            if food.ratingsCount > 0, let averageRating = food.averageRating {
-                                HStack(spacing: 2) {
-                                    Image(systemName: "star.fill")
-                                    Text(String(format: "%.1f", averageRating))
-                                }
-                                .font(.system(size: 10))
-                                .foregroundColor(.orange)
-                                .lineLimit(1)
-                                .fixedSize(horizontal: true, vertical: false)
+            
+            if (food.foodClass != FoodClass.nothing || food.allergens.isEmpty) {            
+                HStack {
+                    if (food.foodClass != FoodClass.nothing) {
+                        Text(NSLocalizedString(String(describing: food.foodClass), comment: Constants.EMPTY))
+                            .font(.system(size: 10))
+                            .italic()
+                    }
+                    
+                    if (!food.allergens.isEmpty) {
+                        Text(allergensString(allergens: food.allergens))
+                            .font(.system(size: 10))
+                            .foregroundColor(Color.gray)
+                    }
+                    
+#if os(iOS)
+                    if food.nutritionalInfo != nil {
+                        Button(action: {
+                            isShowingNutritionalInfo.toggle()
+                        }) {
+                            if isShowingNutritionalInfo {
+                                Image(systemName: "chevron.up")
+                                    .foregroundColor(Constants.COLOR_ACCENT)
+                            }
+                            else {
+                                Image(systemName: "chevron.down")
+                                    .foregroundColor(Constants.COLOR_ACCENT)
                             }
                             
                             Text(NSLocalizedString(String(describing: food.foodClass), comment: Constants.EMPTY))
@@ -63,7 +68,13 @@ struct FoodRow: View {
                     }
                 }
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
+            
+#if os(iOS)
+            if isShowingNutritionalInfo {
+                    NutritionalInfoView(food: food)
+                        .padding(.top, 5)
+            }
+#endif
         }
 #if os(iOS)
         .contentShape(Rectangle())
