@@ -9,8 +9,16 @@
 import Foundation
 import SwiftUI
 
-extension Notification.Name {
-    static let repositoryDidUpdateCanteenData = Notification.Name("repositoryDidUpdateCanteenData")
+private struct RepositoryEnvironmentKey: EnvironmentKey {
+    static let defaultValue = Repository()
+}
+
+extension EnvironmentValues {
+    /// Service used by views to load canteen menu data.
+    var repository: Repository {
+        get { self[RepositoryEnvironmentKey.self] }
+        set { self[RepositoryEnvironmentKey.self] = newValue }
+    }
 }
 
 extension Date {

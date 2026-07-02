@@ -7,12 +7,15 @@
 //
 
 import Foundation
+import Observation
 
-class Canteen: ObservableObject, Codable {
-    @Published var name: String
-    @Published var foodOnDayX: [Int: [FoodLine]]
-    @Published var dateOfLastFetching: Date
-    @Published var nextOpenDays: [Date]
+/// Menu data for one canteen, grouped by working-day index.
+@Observable
+final class Canteen: Codable {
+    var name: String
+    var foodOnDayX: [Int: [FoodLine]]
+    var dateOfLastFetching: Date
+    var nextSevenWorkingDays: [Date]
     
     enum CodingKeys: String, CodingKey {
         case name
@@ -21,6 +24,7 @@ class Canteen: ObservableObject, Codable {
         case nextOpenDays
     }
     
+    /// Creates canteen menu data and derives the displayed working days.
     init(name: String, foodOnDayX: [Int: [FoodLine]], dateOfLastFetching: Date) {
         self.name = name
         self.foodOnDayX = foodOnDayX

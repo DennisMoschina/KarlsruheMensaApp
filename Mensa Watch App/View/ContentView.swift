@@ -20,17 +20,20 @@ struct ContentView: View {
     
     @State var daySelection: Double = 0.0
     @State var showDatePicker: Bool = false
-    @EnvironmentObject private var phoneMessaging: PhoneMessaging
-    @ObservedObject var viewModel = ViewModel.shared
+    @Environment(PhoneMessaging.self) private var phoneMessaging
+    @Environment(ViewModel.self) private var viewModel
+    @Environment(\.repository) private var repository
     
     var body: some View {
+        @Bindable var phoneMessaging = phoneMessaging
+
         ZStack {
             if (!viewModel.areCanteensNil()) {
                 if (self.showDatePicker) {
                     ContextMenuView(daySelection: self.$daySelection, showDatePicker: self.$showDatePicker)
                 }
                 else {
-                    WatchFoodView(foodOnDayX: viewModel.canteen!.foodOnDayX, priceGroup: self.$phoneMessaging.priceGroup, daySelection: self.$daySelection)
+                    WatchFoodView(foodOnDayX: viewModel.canteen!.foodOnDayX, priceGroup: $phoneMessaging.priceGroup, daySelection: self.$daySelection)
                 }
             }
             else {
@@ -40,7 +43,7 @@ struct ContentView: View {
         .navigationTitle(Text(getTitleBarString(daySelection: Int(self.daySelection))))
         .accentColor(Color.green)
         .onAppear {
-            phoneMessaging.requestCanteenDataFromPhone()
+            repository.get(viewModel: viewModel)
         }
         .onLongPressGesture {
             showDatePicker = !showDatePicker;
@@ -59,7 +62,11 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
+        let viewModel = ViewModel()
+
         ContentView()
+            .environment(viewModel)
+            .environment(PhoneMessaging(viewModel: viewModel))
     }
 }
 

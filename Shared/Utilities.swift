@@ -105,8 +105,8 @@ func getFoodClassFromImage(iconTitle: String?) -> FoodClass {
     return .nothing
 }
 
-func getURL(weekNumber: Int) -> URL {
-    let canteen = ViewModel.shared.canteenSelection
+/// Builds the Studierendenwerk menu URL for a canteen and calendar week.
+func getURL(weekNumber: Int, canteen: Canteens) -> URL {
     var canteenStr = Constants.API_ABBREVIATIONS_CANTEEN_ADENAUERRING
     
     switch(canteen) {
@@ -147,20 +147,10 @@ func parseAllergens(from rawValue: String) -> [Allergen] {
     return result
 }
 
-func allergensString(allergens: [Allergen]) -> String {
-    let labels = allergens.map { $0.localizedShortLabel }
-    guard !labels.isEmpty else { return Constants.EMPTY }
-    return "[\(labels.joined(separator: Constants.COMMA + Constants.SPACE))]"
-}
-
-func allergensLongString(allergens: [Allergen]) -> String {
-    allergens.map { "\($0.code) \($0.localizedName)" }.joined(separator: "\n")
-}
-
-func removeExcludedFood(food: [Food]) -> [Food] {
+/// Applies the user's dietary filters to a list of menu items.
+func removeUnwantedFood(foods: [Food], settings: ViewModel) -> [Food] {
 
     var result = [Food]()
-    let settings = ViewModel.shared
     
     for food in food {
         if !settings.excludedAllergens.isDisjoint(with: Set(food.allergens)) {
@@ -195,32 +185,3 @@ private func imageCacheRootDirectory() -> URL {
     return directory
 }
 
-func cachedImageFileURL(for remoteURL: URL) -> URL {
-    let hash = SHA256.hash(data: Data(remoteURL.absoluteString.utf8)).map { String(format: "%02x", $0) }.joined()
-    let ext = remoteURL.pathExtension.isEmpty ? "jpg" : remoteURL.pathExtension
-    return imageCacheRootDirectory().appendingPathComponent("\(hash).\(ext)")
-}
-
-func cachedImageData(for remoteURL: URL) -> Data? {
-    let fileURL = cachedImageFileURL(for: remoteURL)
-    return try? Data(contentsOf: fileURL)
-}
-
-func storeCachedImageData(_ data: Data, for remoteURL: URL) {
-    let fileURL = cachedImageFileURL(for: remoteURL)
-    try? data.write(to: fileURL, options: .atomic)
-}
-
-func prefetchImageDataIfNeeded(from remoteURL: URL) {
-    if cachedImageData(for: remoteURL) != nil {
-        return
-    }
-    var request = URLRequest(url: remoteURL)
-    request.cachePolicy = .returnCacheDataElseLoad
-    request.timeoutInterval = 15
-    
-    URLSession.shared.dataTask(with: request) { data, _, _ in
-        guard let data = data, !data.isEmpty else { return }
-        storeCachedImageData(data, for: remoteURL)
-    }.resume()
-}

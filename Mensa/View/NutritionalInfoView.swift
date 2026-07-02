@@ -9,7 +9,6 @@
 import SwiftUI
 
 struct NutritionalInfoView: View {
-    @ObservedObject var viewModel = ViewModel.shared
     @State var food: Food
     let accentColor = Constants.COLOR_ACCENT
     

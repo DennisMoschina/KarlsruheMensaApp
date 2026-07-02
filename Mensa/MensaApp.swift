@@ -12,11 +12,16 @@ import SwiftUI
 @main
 struct MensaApp: App {
     
-    @StateObject private var connectivityRequestHandler = WatchConnectivityHandler.shared
+    @State private var viewModel = ViewModel()
+    @State private var connectivityRequestHandler = WatchConnectivityHandler()
+    private let repository = Repository()
     
     var body: some Scene {
         WindowGroup {
-            ContentView().environmentObject(connectivityRequestHandler)
+            ContentView()
+                .environment(viewModel)
+                .environment(connectivityRequestHandler)
+                .environment(\.repository, repository)
         }
     }
 }

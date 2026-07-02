@@ -7,18 +7,19 @@
 //
 
 import Foundation
+import Observation
 
-class ViewModel: ObservableObject {
+/// Stores user selections, filter settings, and the currently loaded menu data.
+@Observable
+final class ViewModel {
     
-    static let shared = ViewModel()
+    var showInfo = false
+    var canteenSelection = Canteens(rawValue: UserDefaults.standard.string(forKey: Constants.KEY_CHOSEN_CANTEEN) ?? "Mensa am Adenauerring") ?? Canteens.MENSA_ADENAUERRING
+    var priceGroupSelection = UserDefaults.standard.integer(forKey: Constants.KEY_CHOSEN_PRICE_GROUP)
+    var showAlert = false
+    var loading = true
     
-    @Published var showInfo = false
-    @Published var canteenSelection = Canteens(rawValue: UserDefaults.standard.string(forKey: Constants.KEY_CHOSEN_CANTEEN) ?? "Mensa am Adenauerring") ?? Canteens.MENSA_ADENAUERRING
-    @Published var priceGroupSelection = UserDefaults.standard.integer(forKey: Constants.KEY_CHOSEN_PRICE_GROUP)
-    @Published var showAlert = false
-    @Published var loading = true
-    
-    @Published var onlyVegan: Bool {
+    var onlyVegan: Bool {
         didSet {
             UserDefaults.standard.set(onlyVegan, forKey: "onlyVegan")
             if (onlyVegan && !onlyVegetarian) {
@@ -48,7 +49,7 @@ class ViewModel: ObservableObject {
         }
     }
     
-    @Published var onlyVegetarian: Bool {
+    var onlyVegetarian: Bool {
         didSet {
             UserDefaults.standard.set(onlyVegetarian, forKey: "onlyVegetarian")
             if (onlyVegetarian && !noPork) {
@@ -72,50 +73,38 @@ class ViewModel: ObservableObject {
         }
     }
     
-    @Published var noPork: Bool {
+    var noPork: Bool {
         didSet {
             UserDefaults.standard.set(noPork, forKey: "noPork")
         }
     }
     
-    @Published var noBeef: Bool {
+    var noBeef: Bool {
         didSet {
             UserDefaults.standard.set(noBeef, forKey: "noBeef")
         }
     }
     
-    @Published var noFish: Bool {
+    var noFish: Bool {
         didSet {
             UserDefaults.standard.set(noFish, forKey: "noFish")
         }
     }
     
-    @Published var excludedAllergenCodes: [String] {
-        didSet {
-            let normalized = Array(Set(excludedAllergenCodes.map { $0.lowercased() })).sorted()
-            if normalized != excludedAllergenCodes {
-                excludedAllergenCodes = normalized
-                return
-            }
-            UserDefaults.standard.set(normalized, forKey: "excludedAllergens")
-        }
-    }
+    var canteen: Canteen? = nil
     
-    var excludedAllergens: Set<Allergen> {
-        Set(excludedAllergenCodes.compactMap { Allergen.from(rawCode: $0) })
-    }
-    
-    @Published var canteen: Canteen? = nil
-    
+    /// Returns whether menu data still needs to be loaded.
     func areCanteensNil() -> Bool {
         return self.canteen == nil
     }
     
+    /// Returns the menu lines for a selected day index.
     func getFoodLines(selectedDay: Int) -> [FoodLine] {
         return self.canteen?.foodOnDayX[selectedDay] ?? []
     }
     
-    private init() {
+    /// Creates app state from persisted user defaults.
+    init() {
         self.onlyVegan = UserDefaults.standard.bool(forKey: "onlyVegan")
         self.onlyVegetarian = UserDefaults.standard.bool(forKey: "onlyVegetarian")
         self.noPork = UserDefaults.standard.bool(forKey: "noPork")

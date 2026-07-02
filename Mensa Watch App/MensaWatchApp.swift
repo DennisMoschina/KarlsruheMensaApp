@@ -11,12 +11,23 @@ import SwiftUI
 @main
 struct MensaWatchApp: App {
     
-    @StateObject private var phoneMessaging = PhoneMessaging.shared
+    @State private var viewModel: ViewModel
+    @State private var phoneMessaging: PhoneMessaging
+    private let repository = Repository()
+
+    init() {
+        let viewModel = ViewModel()
+        self._viewModel = State(initialValue: viewModel)
+        self._phoneMessaging = State(initialValue: PhoneMessaging(viewModel: viewModel))
+    }
     
     var body: some Scene {
         WindowGroup {
             NavigationView {
-                ContentView().environmentObject(phoneMessaging)
+                ContentView()
+                    .environment(viewModel)
+                    .environment(phoneMessaging)
+                    .environment(\.repository, repository)
             }
         }
     }

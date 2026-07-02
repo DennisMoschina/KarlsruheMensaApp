@@ -7,15 +7,17 @@
 //
 
 import Foundation
+import Observation
 import WatchConnectivity
 
-class WatchConnectivityHandler: NSObject, ObservableObject {
+/// Handles outgoing updates from the iOS app to the companion watch app.
+@Observable
+final class WatchConnectivityHandler: NSObject, CanteenDataSyncing {
     
-    public static let shared = WatchConnectivityHandler()
-    
+    @ObservationIgnored
     var session = WCSession.default
     
-    private override init() {
+    override init() {
         super.init()
         self.session.delegate = self
         if session.activationState != .activated {
@@ -29,6 +31,7 @@ class WatchConnectivityHandler: NSObject, ObservableObject {
         )
     }
     
+    /// Sends full canteen data to the watch immediately or queues it for later delivery.
     func sendCanteenDataToWatch(canteen: Canteen, priceGroup: Int) {
         if self.session.isReachable {
             if let encodedData = try? JSONEncoder().encode(canteen) {
@@ -43,6 +46,7 @@ class WatchConnectivityHandler: NSObject, ObservableObject {
         }
     }
     
+    /// Sends a price-group-only update to the watch.
     func sendUpdatedPriceGroupToWatch(priceGroup: Int) {
         if self.session.isReachable {
             self.session.sendMessage(["priceGroup" : priceGroup], replyHandler: nil)

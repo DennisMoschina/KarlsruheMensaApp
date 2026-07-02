@@ -9,11 +9,15 @@
 import SwiftUI
  
 struct FoodView: View {
-    @ObservedObject var viewModel = ViewModel.shared
+    @Environment(ViewModel.self) private var viewModel
+    @Environment(WatchConnectivityHandler.self) private var watchConnectivity
+    @Environment(\.repository) private var repository
     var day: Int
     var onFoodSelected: ((Food) -> Void)? = nil
     
     var body: some View {
+        @Bindable var viewModel = viewModel
+
         List {
             let foodLines = self.viewModel.getFoodLines(selectedDay: day)
             let openFoodLines = foodLines.filter { $0.closingText == Constants.EMPTY && !$0.foods.isEmpty }
@@ -43,15 +47,22 @@ struct FoodView: View {
                         ClosedRow(info: Constants.DASH)
                     }
                 } else {
-                    Section(header: Text(foodLine.name)) {
-                        ClosedRow(info: foodLine.closingText)
+                    let foods = removeUnwantedFood(foods: foodLine.foods, settings: viewModel)
+
+                    if (!foods.isEmpty) {
+                        Section(header: Text(foodLine.name)) {
+                            ForEach(foods, id: \.name) { food in
+                                FoodRow(food: food, priceGroup: $viewModel.priceGroupSelection)
+                            }
+                            .padding(.bottom, 5)
+                        }
                     }
                 }
             }
         }
         .refreshable {
-            ViewModel.shared.loading = true
-            Repository.shared.get()
+            viewModel.loading = true
+            repository.get(viewModel: viewModel, dataSyncer: watchConnectivity)
         }
     }
 }
@@ -60,5 +71,7 @@ struct FoodView: View {
 struct FoodView_Previews: PreviewProvider {
     static var previews: some View {
         FoodView(day: 0)
+            .environment(ViewModel())
+            .environment(WatchConnectivityHandler())
     }
 }

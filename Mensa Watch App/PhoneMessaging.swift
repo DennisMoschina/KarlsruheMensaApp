@@ -7,18 +7,25 @@
 //
 
 import Foundation
+import Observation
 import WatchConnectivity
 
-class PhoneMessaging: NSObject, ObservableObject {
+/// Receives canteen and settings updates from the paired iPhone.
+@Observable
+final class PhoneMessaging: NSObject {
     
-    public static let shared = PhoneMessaging()
-    
+    @ObservationIgnored
     private var session = WCSession.default
+
+    @ObservationIgnored
+    private let viewModel: ViewModel
     
-    @Published var canteenSelection: Int = 0
-    @Published var priceGroup: Int = 0
+    var canteenSelection: Int = 0
+    var priceGroup: Int = 0
     
-    private override init() {
+    /// Creates a phone messaging bridge that writes received menus into app state.
+    init(viewModel: ViewModel) {
+        self.viewModel = viewModel
         super.init()
         self.session.delegate = self
         self.session.activate()
@@ -38,12 +45,9 @@ class PhoneMessaging: NSObject, ObservableObject {
 }
 
 extension PhoneMessaging: WCSessionDelegate {
+    /// Handles watch connectivity activation completion.
     func session(_: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
-        if activationState == .activated {
-            DispatchQueue.main.async {
-                self.objectWillChange.send() // Notify SwiftUI that the object has changed
-            }
-        }
+        debugPrint("WCSession activationDidCompleteWith activationState:\(activationState) error:\(String(describing: error))")
     }
 
 #if os(iOS)
@@ -54,54 +58,36 @@ extension PhoneMessaging: WCSessionDelegate {
     
     //when app is running on watch as well as on phone -> immediate ui change on watch, if canteen changes on phone
     func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
-        DispatchQueue.main.async {
-            if let newCanteenSelection = message["canteenSelection"] as? Int {
-                self.canteenSelection = newCanteenSelection
-                UserDefaults.standard.set(newCanteenSelection, forKey: Constants.KEY_CHOSEN_CANTEEN)
-                print("updated canteen selection!")
-                print("new selection: \(newCanteenSelection)")
-            }
-
-            if let canteenData = message["canteen"] as? Data {
-                do {
-                    let canteen = try JSONDecoder().decode(Canteen.self, from: canteenData)
-                    ViewModel.shared.canteen = canteen
-                } catch {
-                    print("Failed to decode canteen data: \(error)")
-                }
-            }
-
-            if let newPriceGroup = message["priceGroup"] as? Int {
-                self.priceGroup = newPriceGroup
-                UserDefaults.standard.set(newPriceGroup, forKey: Constants.KEY_CHOSEN_PRICE_GROUP)
-                print("updated price group!")
-                print("new selection: \(newPriceGroup)")
+        if let newCanteenSelection = message["canteenSelection"] as? Int {
+            self.canteenSelection = newCanteenSelection
+            UserDefaults.standard.set(newCanteenSelection, forKey: Constants.KEY_CHOSEN_CANTEEN)
+            print("updated canteen selection!")
+            print("new selection: \(newCanteenSelection)")
+        }
+        
+        if let canteenData = message["canteen"] as? Data {
+            do {
+                let canteen = try JSONDecoder().decode(Canteen.self, from: canteenData)
+                viewModel.canteen = canteen
+            } catch {
+                print("Failed to decode canteen data: \(error)")
             }
         }
     }
     
     //when watch app is not running
     func session(_ session: WCSession, didReceiveUserInfo userInfo: [String : Any] = [:]) {
-        DispatchQueue.main.async {
-            if let newCanteenSelection = userInfo["canteenSelection"] as? Int {
-                UserDefaults.standard.set(newCanteenSelection, forKey: Constants.KEY_CHOSEN_CANTEEN)
-                self.canteenSelection = newCanteenSelection
-            }
-
-            if let canteenData = userInfo["canteen"] as? Data {
-                do {
-                    let canteen = try JSONDecoder().decode(Canteen.self, from: canteenData)
-                    ViewModel.shared.canteen = canteen
-                } catch {
-                    print("Failed to decode canteen data: \(error)")
-                }
-            }
-
-            if let newPriceGroup = userInfo["priceGroup"] as? Int {
-                self.priceGroup = newPriceGroup
-                UserDefaults.standard.set(newPriceGroup, forKey: Constants.KEY_CHOSEN_PRICE_GROUP)
-                print("updated price group!")
-                print("new selection: \(newPriceGroup)")
+        if let newCanteenSelection = userInfo["canteenSelection"] as? Int {
+            UserDefaults.standard.set(newCanteenSelection, forKey: Constants.KEY_CHOSEN_CANTEEN)
+            self.canteenSelection = newCanteenSelection
+        }
+        
+        if let canteenData = userInfo["canteen"] as? Data {
+            do {
+                let canteen = try JSONDecoder().decode(Canteen.self, from: canteenData)
+                viewModel.canteen = canteen
+            } catch {
+                print("Failed to decode canteen data: \(error)")
             }
         }
     }

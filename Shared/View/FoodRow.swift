@@ -12,7 +12,7 @@ import UIKit
 #endif
 
 struct FoodRow: View {
-    @ObservedObject var food: Food
+    @Bindable var food: Food
     @Binding var priceGroup: Int
     var onTap: (() -> Void)? = nil
 
@@ -87,94 +87,6 @@ struct ClosedRow: View {
     }
 }
 
-#if os(iOS)
-private struct CachedMealCardImageView: View {
-    let url: URL?
-    @StateObject private var loader: CachedMealImageLoader
-
-    init(url: URL?) {
-        self.url = url
-        _loader = StateObject(wrappedValue: CachedMealImageLoader(url: url))
-    }
-
-    var body: some View {
-        if let url {
-            Group {
-                if let image = loader.image {
-                    Image(uiImage: image)
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                } else {
-                    RoundedRectangle(cornerRadius: 8, style: .continuous)
-                        .fill(Color(.secondarySystemFill))
-                        .overlay {
-                            ProgressView()
-                        }
-                }
-            }
-            .frame(width: 65, height: 65)
-            .clipped()
-            .cornerRadius(8)
-            .onAppear {
-                loader.loadIfNeeded()
-            }
-        }
-    }
-}
-
-final class CachedMealImageLoader: ObservableObject {
-    static let memoryCache = NSCache<NSURL, UIImage>()
-
-    @Published var image: UIImage?
-
-    private let url: URL?
-    private var hasStartedLoading = false
-
-    init(url: URL?) {
-        self.url = url
-
-        guard let url else {
-            return
-        }
-
-        if let cachedImage = Self.memoryCache.object(forKey: url as NSURL) {
-            self.image = cachedImage
-            self.hasStartedLoading = true
-            return
-        }
-
-        if let data = cachedImageData(for: url), let diskImage = UIImage(data: data) {
-            Self.memoryCache.setObject(diskImage, forKey: url as NSURL)
-            self.image = diskImage
-            self.hasStartedLoading = true
-        }
-    }
-
-    func loadIfNeeded() {
-        guard let url, !hasStartedLoading else {
-            return
-        }
-
-        hasStartedLoading = true
-        var request = URLRequest(url: url)
-        request.cachePolicy = .returnCacheDataElseLoad
-        request.timeoutInterval = 20
-
-        URLSession.shared.dataTask(with: request) { data, _, _ in
-            guard let data, let image = UIImage(data: data) else { return }
-            storeCachedImageData(data, for: url)
-            Self.memoryCache.setObject(image, forKey: url as NSURL)
-            DispatchQueue.main.async {
-                self.image = image
-            }
-        }.resume()
-    }
-}
-#endif
-
 #Preview {
-    FoodRow(
-        food: Food(name: "Schnitzel mit extrem langen Zutaten, Salat, Soße, Zitronenscheiben, lecker mit ganz viel Zutaten und viel Soße hmm fein", bio: true, allergens: ["Sa", "So", "We", "Se", "Ei", "Ml"], prices: [3.40, 3.40, 3.40], foodClass: FoodClass.vegetarian, nutritionalInfo: NutritionalInfo(energy: "1", proteins: "1", carbohydrates: "1", sugar: "1", fat: "1", saturatedFat: "1", salt: "1", co2Value: "1", co2Score: 1, waterValue: "1", waterScore: 1, animalWelfareScore: 1, rainforestScore: 1, environmentScore: 1), imageURL: URL("url.com")!, averageRating: 4.3, ratingsCount: 3),
-        priceGroup: .constant(0)
-    )
+    FoodRow(food: Food(name: "Spaghetti", bio: false, allergens: ["a", "b"], prices: [3.6, 3.8], foodClass: .beef, nutritionalInfo: nil), priceGroup: .constant(0))
 }

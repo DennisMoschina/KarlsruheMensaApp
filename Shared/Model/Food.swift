@@ -7,8 +7,11 @@
 //
 
 import Foundation
+import Observation
 
-class Food: Codable, Identifiable, ObservableObject {
+/// Single menu item including labels, prices, and optional nutritional details.
+@Observable
+final class Food: Codable, Identifiable {
     var id = UUID()
     var apiMealID: String?
     var name: String
@@ -18,13 +21,8 @@ class Food: Codable, Identifiable, ObservableObject {
     var foodClass: FoodClass
     var priceInfo: String
     var nutritionalInfo: NutritionalInfo?
-    @Published var imageURL: URL?
-    @Published var imageEntries: [FoodImageEntry]
-    @Published var averageRating: Double?
-    @Published var ratingsCount: Int
-    @Published var personalRating: Int?
-    @Published var showNutritionalInfo = false
-
+    var showNutritionalInfo = false
+    
     enum CodingKeys: String, CodingKey {
         case apiMealID
         case name
@@ -39,22 +37,9 @@ class Food: Codable, Identifiable, ObservableObject {
         case ratingsCount
         case personalRating
     }
-
-    init(
-        apiMealID: String? = nil,
-        name: String,
-        bio: Bool,
-        allergens: [String],
-        prices: [Float],
-        foodClass: FoodClass,
-        nutritionalInfo: NutritionalInfo?,
-        imageURL: URL? = nil,
-        imageEntries: [FoodImageEntry] = [],
-        averageRating: Double? = nil,
-        ratingsCount: Int = 0,
-        personalRating: Int? = nil
-    ) {
-        self.apiMealID = apiMealID
+    
+    /// Creates a regular menu item.
+    init(name: String, bio: Bool, allergens: [String], prices: [Float], foodClass: FoodClass, nutritionalInfo: NutritionalInfo?) {
         self.name = name
         self.bio = bio
         self.allergens = allergens.flatMap { parseAllergens(from: $0) }
@@ -69,6 +54,7 @@ class Food: Codable, Identifiable, ObservableObject {
         self.personalRating = personalRating
     }
     
+    /// Creates a placeholder item used for closed food lines.
     init(closingText: String) {
         self.apiMealID = nil
         self.name = Constants.EMPTY
