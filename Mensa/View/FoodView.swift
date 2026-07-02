@@ -49,6 +49,10 @@ struct FoodView: View {
                 }
             }
         }
+        .refreshable {
+            ViewModel.shared.loading = true
+            Repository.shared.get()
+        }
     }
 }
 
