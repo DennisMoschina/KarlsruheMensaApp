@@ -175,7 +175,7 @@ enum Allergen: String, Codable, CaseIterable, Hashable, Identifiable {
     var code: String { rawValue.uppercased() }
     
     var localizedName: String {
-        let isGerman = Locale.current.languageCode?.prefix(2) == "de"
+        let isGerman = Locale.current.language.languageCode?.identifier == "de"
         switch self {
         case .ca: return isGerman ? "Cashewnuesse" : "Cashew nuts"
         case .di: return isGerman ? "Dinkel / Gluten aus Dinkel" : "Spelt / gluten from spelt"

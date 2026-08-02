@@ -6,13 +6,16 @@
 //
 
 import SwiftUI
-#if os(iOS)
+#if canImport(PhotosUI)
 import PhotosUI
+#endif
+#if canImport(UIKit)
 import UIKit
 #endif
 
 struct DetailedFoodView: View {
     let food: Food
+    @Environment(\.dismiss) private var dismiss
     @Environment(\.repository) private var repository
     @State private var uploadInProgress = false
     @State private var ratingInProgress = false
@@ -22,8 +25,11 @@ struct DetailedFoodView: View {
     @GestureState private var imageDragOffset: CGFloat = 0
 #if os(iOS)
     @State private var showImageSourceDialog = false
-    @State private var showImagePicker = false
-    @State private var imagePickerSourceType: UIImagePickerController.SourceType = .photoLibrary
+    @State private var showCameraPicker = false
+#endif
+#if canImport(PhotosUI)
+    @State private var showPhotoLibraryPicker = false
+    @State private var selectedPhotoItem: PhotosPickerItem?
 #endif
 
     var body: some View {
@@ -75,6 +81,16 @@ struct DetailedFoodView: View {
             .background(Color(.systemGroupedBackground))
             .navigationBarTitleDisplayMode(.inline)
             .navigationTitle("")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "xmark")
+                    }
+                    .accessibilityLabel(NSLocalizedString("Close", comment: "Close sheet button"))
+                }
+            }
             .sheet(isPresented: $showRatingSheet) {
                 RateMealSheet(
                     currentRating: food.personalRating,
@@ -87,22 +103,25 @@ struct DetailedFoodView: View {
             .confirmationDialog(NSLocalizedString("Upload photo", comment: "Upload confirmation dialog title"), isPresented: $showImageSourceDialog, titleVisibility: .visible) {
                 if UIImagePickerController.isSourceTypeAvailable(.camera) {
                     Button(NSLocalizedString("Take Photo", comment: "Open camera button")) {
-                        imagePickerSourceType = .camera
-                        showImagePicker = true
+                        showCameraPicker = true
                     }
                 }
+#if canImport(PhotosUI)
                 Button(NSLocalizedString("Choose from Library", comment: "Open photo library button")) {
-                    imagePickerSourceType = .photoLibrary
-                    showImagePicker = true
+                    showPhotoLibraryPicker = true
                 }
+#endif
                 Button(NSLocalizedString("Cancel", comment: "Cancel action"), role: .cancel) { }
             }
-            .sheet(isPresented: photoLibraryPickerBinding) {
-                imagePickerView(sourceType: .photoLibrary)
-            }
-            .fullScreenCover(isPresented: cameraPickerBinding) {
+            .fullScreenCover(isPresented: $showCameraPicker) {
                 imagePickerView(sourceType: .camera)
                     .ignoresSafeArea()
+            }
+#endif
+#if canImport(PhotosUI)
+            .photosPicker(isPresented: $showPhotoLibraryPicker, selection: $selectedPhotoItem, matching: .images)
+            .onChange(of: selectedPhotoItem) { _, newItem in
+                loadSelectedPhoto(newItem)
             }
 #endif
         }
@@ -117,21 +136,20 @@ struct DetailedFoodView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    private var foodTitleText: Text {
-        let baseText = Text(food.name)
-            .font(.title2.weight(.semibold))
-            .foregroundColor(.primary)
+    private var foodTitleText: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 6) {
+            Text(food.name)
+                .font(.title2.weight(.semibold))
+                .foregroundColor(.primary)
 
-        guard food.foodClass != .nothing else {
-            return baseText
+            if food.foodClass != .nothing {
+                let foodClassLabel = NSLocalizedString(String(describing: food.foodClass), comment: Constants.EMPTY)
+                Text("(\(foodClassLabel))")
+                    .font(.subheadline)
+                    .italic()
+                    .foregroundColor(.secondary)
+            }
         }
-
-        let foodClassLabel = NSLocalizedString(String(describing: food.foodClass), comment: Constants.EMPTY)
-
-        return baseText + Text("  (\(foodClassLabel))")
-            .font(.subheadline)
-            .italic()
-            .foregroundColor(.secondary)
     }
     
     private var foodImage: some View {
@@ -173,7 +191,7 @@ struct DetailedFoodView: View {
                 }
             }
         }
-        .onChange(of: foodImages.count) { newCount in
+        .onChange(of: foodImages.count) { _, newCount in
             selectedImageIndex = min(selectedImageIndex, max(0, newCount - 1))
         }
     }
@@ -288,7 +306,17 @@ struct DetailedFoodView: View {
     private var photoUploadSection: some View {
         Button {
 #if os(iOS)
+#if canImport(PhotosUI)
+            if UIImagePickerController.isSourceTypeAvailable(.camera) {
+                showImageSourceDialog = true
+            } else {
+                showPhotoLibraryPicker = true
+            }
+#else
             showImageSourceDialog = true
+#endif
+#elseif canImport(PhotosUI)
+            showPhotoLibraryPicker = true
 #endif
         } label: {
             Label(NSLocalizedString("Upload photo", comment: "Upload photo button"), systemImage: "camera")
@@ -299,7 +327,17 @@ struct DetailedFoodView: View {
         .buttonStyle(.borderedProminent)
         .buttonBorderShape(.roundedRectangle(radius: 8))
         .tint(.blue)
-        .disabled(uploadInProgress || food.apiMealID == nil)
+        .disabled(uploadInProgress || food.apiMealID == nil || !photoUploadAvailable)
+    }
+
+    private var photoUploadAvailable: Bool {
+#if canImport(PhotosUI)
+        true
+#elseif os(iOS)
+        UIImagePickerController.isSourceTypeAvailable(.camera)
+#else
+        false
+#endif
     }
     
     private func sectionCard<Content: View>(title: String, @ViewBuilder content: () -> Content) -> some View {
@@ -336,29 +374,37 @@ struct DetailedFoodView: View {
         }
     }
 
+#if canImport(PhotosUI)
+    private func loadSelectedPhoto(_ item: PhotosPickerItem?) {
+        guard let item else {
+            return
+        }
+
+        Task {
+            do {
+                guard let imageData = try await item.loadTransferable(type: Data.self) else {
+                    await MainActor.run {
+                        feedbackMessage = NSLocalizedString("Image could not be loaded.", comment: "Image picker failure")
+                        selectedPhotoItem = nil
+                    }
+                    return
+                }
+
+                await MainActor.run {
+                    selectedPhotoItem = nil
+                    uploadImageData(imageData)
+                }
+            } catch {
+                await MainActor.run {
+                    feedbackMessage = NSLocalizedString("Image could not be loaded.", comment: "Image picker failure")
+                    selectedPhotoItem = nil
+                }
+            }
+        }
+    }
+#endif
+
 #if os(iOS)
-    private var cameraPickerBinding: Binding<Bool> {
-        Binding(
-            get: { showImagePicker && imagePickerSourceType == .camera },
-            set: { newValue in
-                if !newValue {
-                    showImagePicker = false
-                }
-            }
-        )
-    }
-
-    private var photoLibraryPickerBinding: Binding<Bool> {
-        Binding(
-            get: { showImagePicker && imagePickerSourceType == .photoLibrary },
-            set: { newValue in
-                if !newValue {
-                    showImagePicker = false
-                }
-            }
-        )
-    }
-
     private func imagePickerView(sourceType: UIImagePickerController.SourceType) -> some View {
         ImagePicker(sourceType: sourceType) { image in
             guard let jpeg = image.jpegData(compressionQuality: 0.85) else {
@@ -372,7 +418,7 @@ struct DetailedFoodView: View {
     
 }
 
-#if os(iOS)
+#if canImport(UIKit)
 private struct CachedMealHeroImageView<Placeholder: View>: View {
     let url: URL
     let placeholder: Placeholder
@@ -402,8 +448,33 @@ private struct CachedMealHeroImageView<Placeholder: View>: View {
         .onAppear {
             loader.loadIfNeeded()
         }
-        .onChange(of: url) { _ in
+        .onChange(of: url) { _, _ in
             loader.loadIfNeeded()
+        }
+    }
+}
+#else
+private struct CachedMealHeroImageView<Placeholder: View>: View {
+    let url: URL
+    let placeholder: Placeholder
+    let size: CGSize
+
+    var body: some View {
+        AsyncImage(url: url) { phase in
+            switch phase {
+            case .success(let image):
+                image
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: size.width, height: size.height)
+                    .clipped()
+            case .failure, .empty:
+                placeholder
+                    .frame(width: size.width, height: size.height)
+            @unknown default:
+                placeholder
+                    .frame(width: size.width, height: size.height)
+            }
         }
     }
 }
@@ -440,9 +511,12 @@ private struct RateMealSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button(NSLocalizedString("Cancel", comment: "Cancel action")) {
+                    Button {
                         dismiss()
+                    } label: {
+                        Image(systemName: "xmark")
                     }
+                    .accessibilityLabel(NSLocalizedString("Close", comment: "Close sheet button"))
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button(NSLocalizedString("Save", comment: "Save action")) {
@@ -534,4 +608,3 @@ private struct DetailedFoodSheetPreview: View {
 #Preview {
     DetailedFoodSheetPreview()
 }
-

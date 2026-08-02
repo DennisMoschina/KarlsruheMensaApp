@@ -22,7 +22,6 @@ struct ContentView: View {
     @State var showDatePicker: Bool = false
     @Environment(PhoneMessaging.self) private var phoneMessaging
     @Environment(ViewModel.self) private var viewModel
-    @Environment(\.repository) private var repository
     
     var body: some View {
         @Bindable var phoneMessaging = phoneMessaging
@@ -82,7 +81,7 @@ func getTitleBarString(daySelection: Int) -> String {
         else if (Int(daySelection) == 1) {
             return Constants.WATCH_TOMORROW
         }
-        else if (Locale.current.languageCode?.prefix(2) == "de" && Int(daySelection) == 2) {
+        else if (Locale.current.language.languageCode?.identifier == "de" && Int(daySelection) == 2) {
             return Constants.WATCH_DATOMORROW
         }
     }

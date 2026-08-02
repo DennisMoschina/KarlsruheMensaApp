@@ -12,6 +12,7 @@ struct WeekDaysView: View {
     private let maxPhoneLikeWidth: CGFloat = 390
     
     @Binding var selection: Int
+    @Environment(\.scenePhase) private var scenePhase
     @State private var currentDate = Date()
     @State private var workingDays = [Date]()
     @State private var workingDayAbbreviations = [String]()
@@ -75,10 +76,12 @@ struct WeekDaysView: View {
         .onAppear {
             updateWorkingDays()
         }
-        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
-            updateWorkingDays()
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active {
+                updateWorkingDays()
+            }
         }
-        .onChange(of: self.selection) { newSelection in
+        .onChange(of: self.selection) { _, newSelection in
             self.selection = max(0, min(newSelection, Constants.DAYS_PER_WEEK - 1))
         }
     }

@@ -40,7 +40,7 @@ func getSelectedDateString(date: Date, offset: Int, onlyDay: Bool) -> String {
     let month = dateFormatter.string(from: date)
     let year = String(userCalendar.component(.year, from: date))
     var dot = Constants.EMPTY
-    if Locale.current.languageCode?.hasPrefix(Constants.LANGUAGE_PREFIX_DE) == true {
+    if Locale.current.language.languageCode?.identifier.hasPrefix(Constants.LANGUAGE_PREFIX_DE) == true {
         dot = Constants.DOT
     }
     if (onlyDay) {

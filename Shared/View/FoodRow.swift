@@ -7,7 +7,7 @@
 //
 
 import SwiftUI
-#if os(iOS)
+#if canImport(UIKit)
 import UIKit
 #endif
 
@@ -65,14 +65,12 @@ struct FoodRow: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
-#if os(iOS)
         .contentShape(Rectangle())
         .onTapGesture {
             if !isClosedFood {
                 onTap?()
             }
         }
-#endif
         .transaction { transaction in
             transaction.animation = nil
         }
@@ -87,7 +85,7 @@ struct ClosedRow: View {
     }
 }
 
-#if os(iOS)
+#if canImport(UIKit) && !os(watchOS)
 private struct CachedMealCardImageView: View {
     let url: URL?
     @StateObject private var loader: CachedMealImageLoader
@@ -98,7 +96,7 @@ private struct CachedMealCardImageView: View {
     }
 
     var body: some View {
-        if let url {
+        if url != nil {
             Group {
                 if let image = loader.image {
                     Image(uiImage: image)
@@ -121,7 +119,47 @@ private struct CachedMealCardImageView: View {
         }
     }
 }
+#elseif !os(watchOS)
+private struct CachedMealCardImageView: View {
+    let url: URL?
 
+    var body: some View {
+        if let url {
+            AsyncImage(url: url) { phase in
+                switch phase {
+                case .success(let image):
+                    image
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                case .failure:
+                    placeholderImage(systemName: "photo")
+                case .empty:
+                    placeholderImage(systemName: "photo")
+                        .overlay {
+                            ProgressView()
+                        }
+                @unknown default:
+                    placeholderImage(systemName: "photo")
+                }
+            }
+            .frame(width: 65, height: 65)
+            .clipped()
+            .cornerRadius(8)
+        }
+    }
+
+    private func placeholderImage(systemName: String) -> some View {
+        RoundedRectangle(cornerRadius: 8, style: .continuous)
+            .fill(.secondary.opacity(0.15))
+            .overlay {
+                Image(systemName: systemName)
+                    .foregroundStyle(.secondary)
+            }
+    }
+}
+#endif
+
+#if canImport(UIKit) && !os(watchOS)
 final class CachedMealImageLoader: ObservableObject {
     static let memoryCache = NSCache<NSURL, UIImage>()
 
@@ -174,7 +212,7 @@ final class CachedMealImageLoader: ObservableObject {
 
 #Preview {
     FoodRow(
-        food: Food(name: "Schnitzel mit extrem langen Zutaten, Salat, Soße, Zitronenscheiben, lecker mit ganz viel Zutaten und viel Soße hmm fein", bio: true, allergens: ["Sa", "So", "We", "Se", "Ei", "Ml"], prices: [3.40, 3.40, 3.40], foodClass: FoodClass.vegetarian, nutritionalInfo: NutritionalInfo(energy: "1", proteins: "1", carbohydrates: "1", sugar: "1", fat: "1", saturatedFat: "1", salt: "1", co2Value: "1", co2Score: 1, waterValue: "1", waterScore: 1, animalWelfareScore: 1, rainforestScore: 1, environmentScore: 1), imageURL: URL("url.com")!, averageRating: 4.3, ratingsCount: 3),
+        food: Food(name: "Schnitzel mit extrem langen Zutaten, Salat, Soße, Zitronenscheiben, lecker mit ganz viel Zutaten und viel Soße hmm fein", bio: true, allergens: ["Sa", "So", "We", "Se", "Ei", "Ml"], prices: [3.40, 3.40, 3.40], foodClass: FoodClass.vegetarian, nutritionalInfo: NutritionalInfo(energy: "1", proteins: "1", carbohydrates: "1", sugar: "1", fat: "1", saturatedFat: "1", salt: "1", co2Value: "1", co2Score: 1, waterValue: "1", waterScore: 1, animalWelfareScore: 1, rainforestScore: 1, environmentScore: 1), imageURL: URL(filePath: "url.com")!, averageRating: 4.3, ratingsCount: 3),
         priceGroup: .constant(0)
     )
 }
