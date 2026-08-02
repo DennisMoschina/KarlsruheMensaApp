@@ -13,7 +13,6 @@ struct MensaWatchApp: App {
     
     @State private var viewModel: ViewModel
     @State private var phoneMessaging: PhoneMessaging
-    private let repository = Repository()
 
     init() {
         let viewModel = ViewModel()
@@ -27,7 +26,6 @@ struct MensaWatchApp: App {
                 ContentView()
                     .environment(viewModel)
                     .environment(phoneMessaging)
-                    .environment(\.repository, repository)
             }
         }
     }

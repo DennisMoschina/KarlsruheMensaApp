@@ -13,23 +13,31 @@ import SwiftUI
 struct MensaApp: App {
     
     @State private var viewModel: ViewModel
-    @State private var connectivityRequestHandler: WatchConnectivityHandler
     private let repository: Repository
+    private let menuService: CanteenMenuService
+    private let dataSyncer: CanteenDataSyncing?
 
     init() {
         let viewModel = ViewModel()
         let repository = Repository()
+        let menuService = CanteenMenuService(repository: repository)
         self.repository = repository
+        self.menuService = menuService
+        #if os(iOS) && !targetEnvironment(macCatalyst)
+        self.dataSyncer = WatchConnectivityHandler(viewModel: viewModel, menuService: menuService)
+        #else
+        self.dataSyncer = nil
+        #endif
         self._viewModel = State(initialValue: viewModel)
-        self._connectivityRequestHandler = State(initialValue: WatchConnectivityHandler(viewModel: viewModel, repository: repository))
     }
     
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environment(viewModel)
-                .environment(connectivityRequestHandler)
                 .environment(\.repository, repository)
+                .environment(\.menuService, menuService)
+                .environment(\.canteenDataSyncer, dataSyncer)
         }
     }
 }

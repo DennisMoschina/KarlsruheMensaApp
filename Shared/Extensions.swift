@@ -13,11 +13,31 @@ private struct RepositoryEnvironmentKey: EnvironmentKey {
     static let defaultValue = Repository()
 }
 
+private struct CanteenMenuServiceEnvironmentKey: EnvironmentKey {
+    static let defaultValue = CanteenMenuService()
+}
+
+private struct CanteenDataSyncerEnvironmentKey: EnvironmentKey {
+    static let defaultValue: CanteenDataSyncing? = nil
+}
+
 extension EnvironmentValues {
-    /// Service used by views to load canteen menu data.
+    /// Repository used by views for canteen API mutations.
     var repository: Repository {
         get { self[RepositoryEnvironmentKey.self] }
         set { self[RepositoryEnvironmentKey.self] = newValue }
+    }
+
+    /// Service used by views to load, cache, and publish canteen menu data.
+    var menuService: CanteenMenuService {
+        get { self[CanteenMenuServiceEnvironmentKey.self] }
+        set { self[CanteenMenuServiceEnvironmentKey.self] = newValue }
+    }
+
+    /// Optional companion-device syncer used after menu data changes.
+    var canteenDataSyncer: CanteenDataSyncing? {
+        get { self[CanteenDataSyncerEnvironmentKey.self] }
+        set { self[CanteenDataSyncerEnvironmentKey.self] = newValue }
     }
 }
 

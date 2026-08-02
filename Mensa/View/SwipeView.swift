@@ -16,8 +16,8 @@ import SwiftUI
 struct SwipeView: View {
 
     @Environment(ViewModel.self) private var viewModel
-    @Environment(WatchConnectivityHandler.self) private var watchConnectivity
-    @Environment(\.repository) private var repository
+    @Environment(\.menuService) private var menuService
+    @Environment(\.canteenDataSyncer) private var dataSyncer
 
     @Binding var daySelection: Int
     private let dayRange = 0..<Constants.DAYS_PER_WEEK
@@ -45,13 +45,13 @@ struct SwipeView: View {
             pagerContent
                 .tabViewStyle(.page(indexDisplayMode: .never))
                 .animation(.interactiveSpring(response: 0.35, dampingFraction: 0.92), value: self.daySelection)
-                .onChange(of: self.daySelection) { newSelection in
+                .onChange(of: self.daySelection) { _, newSelection in
                     self.daySelection = max(self.dayRange.lowerBound, min(newSelection, self.dayRange.upperBound - 1))
                 }
                 .ignoresSafeArea(edges: .bottom)
                 .refreshable {
                     viewModel.loading = true
-                    repository.get(viewModel: viewModel, dataSyncer: watchConnectivity)
+                    menuService.load(viewModel: viewModel, dataSyncer: dataSyncer)
                 }
 
             Color.clear
@@ -70,10 +70,11 @@ struct SwipeView_Previews: PreviewProvider {
     static var previews: some View {
         let viewModel = ViewModel()
         let repository = Repository()
+        let menuService = CanteenMenuService(repository: repository)
 
         SwipeView(daySelection: .constant(0))
             .environment(viewModel)
-            .environment(WatchConnectivityHandler(viewModel: viewModel, repository: repository))
             .environment(\.repository, repository)
+            .environment(\.menuService, menuService)
     }
 }

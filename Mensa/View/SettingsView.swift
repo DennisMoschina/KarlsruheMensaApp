@@ -11,8 +11,8 @@ import SwiftUI
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(ViewModel.self) private var viewModel
-    @Environment(WatchConnectivityHandler.self) private var watchConnectivity
-    @Environment(\.repository) private var repository
+    @Environment(\.menuService) private var menuService
+    @Environment(\.canteenDataSyncer) private var dataSyncer
 
     let accentColor = Constants.COLOR_ACCENT
     
@@ -80,25 +80,27 @@ struct SettingsView: View {
                 }
             }
             .navigationBarTitle(Text("Settings"), displayMode: .inline)
-            .navigationBarItems(trailing: Button(action: {
+            .navigationBarItems(trailing: Button {
                 self.dismiss()
-            }) {
-                Text(Constants.DONE).bold().foregroundColor(self.accentColor)
-            })
+            } label: {
+                Image(systemName: "xmark")
+                    .foregroundColor(self.accentColor)
+            }
+            .accessibilityLabel(NSLocalizedString("Close", comment: "Close sheet button")))
         }
     }
     
     func savePriceGroupSelection(_ tag: Int) {
         self.viewModel.priceGroupSelection = tag
         UserDefaults.standard.set(tag, forKey: Constants.KEY_CHOSEN_PRICE_GROUP)
-        self.watchConnectivity.sendUpdatedPriceGroupToWatch(priceGroup: tag)
+        dataSyncer?.sendPriceGroup(tag)
     }
     
     func saveCanteenSelection(_ tag: Canteens) {
         self.viewModel.loading = true
         self.viewModel.canteenSelection = tag
         UserDefaults.standard.set(tag.rawValue, forKey: Constants.KEY_CHOSEN_CANTEEN)
-        repository.get(refetch: true, viewModel: viewModel, dataSyncer: watchConnectivity)
+        menuService.load(refetch: true, viewModel: viewModel, dataSyncer: dataSyncer)
     }
 }
 
@@ -151,10 +153,11 @@ struct SettingsView_Previews: PreviewProvider {
     static var previews: some View {
         let viewModel = ViewModel()
         let repository = Repository()
+        let menuService = CanteenMenuService(repository: repository)
 
         SettingsView()
             .environment(viewModel)
-            .environment(WatchConnectivityHandler(viewModel: viewModel, repository: repository))
             .environment(\.repository, repository)
+            .environment(\.menuService, menuService)
     }
 }

@@ -21,12 +21,12 @@ final class WatchConnectivityHandler: NSObject, CanteenDataSyncing {
     private let viewModel: ViewModel
 
     @ObservationIgnored
-    private let repository: Repository
+    private let menuService: CanteenMenuService
     
     /// Creates a watch connectivity bridge that can serve canteen data requests.
-    init(viewModel: ViewModel, repository: Repository) {
+    init(viewModel: ViewModel, menuService: CanteenMenuService) {
         self.viewModel = viewModel
-        self.repository = repository
+        self.menuService = menuService
         super.init()
         self.session.delegate = self
         if session.activationState != .activated {
@@ -40,8 +40,8 @@ final class WatchConnectivityHandler: NSObject, CanteenDataSyncing {
         )
     }
     
-    /// Sends full canteen data to the watch immediately or queues it for later delivery.
-    func sendCanteenDataToWatch(canteen: Canteen, priceGroup: Int) {
+    /// Sends full canteen data immediately or queues it for later delivery.
+    func sendCanteenData(canteen: Canteen, priceGroup: Int) {
         if self.session.isReachable {
             if let encodedData = try? JSONEncoder().encode(canteen) {
                 self.session.sendMessage(["canteen" : encodedData, "priceGroup" : priceGroup], replyHandler: nil)
@@ -55,8 +55,8 @@ final class WatchConnectivityHandler: NSObject, CanteenDataSyncing {
         }
     }
     
-    /// Sends a price-group-only update to the watch.
-    func sendUpdatedPriceGroupToWatch(priceGroup: Int) {
+    /// Sends a price-group-only update.
+    func sendPriceGroup(_ priceGroup: Int) {
         if self.session.isReachable {
             self.session.sendMessage(["priceGroup" : priceGroup], replyHandler: nil)
         }
@@ -67,7 +67,7 @@ final class WatchConnectivityHandler: NSObject, CanteenDataSyncing {
     }
     
     private func refreshAndSendCanteenDataToWatch() {
-        repository.get(viewModel: viewModel, dataSyncer: self)
+        menuService.load(viewModel: viewModel, dataSyncer: self)
     }
 }
 

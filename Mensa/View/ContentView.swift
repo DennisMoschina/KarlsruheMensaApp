@@ -13,19 +13,22 @@ struct ContentView: View {
     @State var daySelection = 0
     
     @Environment(ViewModel.self) private var viewModel
-    @Environment(WatchConnectivityHandler.self) private var watchConnectivity
-    @Environment(\.repository) private var repository
+    @Environment(\.menuService) private var menuService
+    @Environment(\.canteenDataSyncer) private var dataSyncer
+    @Environment(\.scenePhase) private var scenePhase
     
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
                 WeekDaysView(selection: self.$daySelection)
+                    .frame(maxWidth: .infinity)
                     .padding(.bottom)
                     .background(Color(uiColor: .systemGroupedBackground))
                 Divider()
                 
                 ZStack {
-                    SwipeView(daySelection: self.$daySelection).blur(radius: self.viewModel.loading ? 3 : 0)
+                    SwipeView(daySelection: self.$daySelection)
+                        .ignoresSafeArea(edges: .bottom)
                     
                     if (self.viewModel.loading) {ProgressView().progressViewStyle(CircularProgressViewStyle())}
                 }
@@ -44,16 +47,18 @@ struct ContentView: View {
             }
         }
         .onAppear {
-            repository.get(viewModel: viewModel, dataSyncer: watchConnectivity)
+            menuService.load(viewModel: viewModel, dataSyncer: dataSyncer)
         }
-        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
-            repository.get(viewModel: viewModel, dataSyncer: watchConnectivity)
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active {
+                menuService.load(viewModel: viewModel, dataSyncer: dataSyncer)
+            }
         }
         //show alert when no internet connection available TODO: not working ATM
 //        .alert(isPresented: self.$viewModel.showAlert) {
 //            Alert(title: Text(Constants.NO_INTERNET), message: Text(Constants.CONNECT), dismissButton: Alert.Button.default(
 //                Text(Constants.TRY_AGAIN), action:  {
-//                    repository.get(viewModel: viewModel, dataSyncer: watchConnectivity) {
+//                    menuService.load(viewModel: viewModel, dataSyncer: dataSyncer) {
 //                        self.viewModel.loading = false
 //                        self.viewModel.showAlert = false
 //                    }
@@ -66,10 +71,11 @@ struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         let viewModel = ViewModel()
         let repository = Repository()
+        let menuService = CanteenMenuService(repository: repository)
 
         ContentView()
             .environment(viewModel)
-            .environment(WatchConnectivityHandler(viewModel: viewModel, repository: repository))
             .environment(\.repository, repository)
+            .environment(\.menuService, menuService)
     }
 }

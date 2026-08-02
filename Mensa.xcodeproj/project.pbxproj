@@ -23,8 +23,11 @@
 		1721F237290AC2FF006CE686 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1721F236290AC2FF006CE686 /* ContentView.swift */; };
 		1721F239290AC302006CE686 /* WatchFoodView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1721F238290AC302006CE686 /* WatchFoodView.swift */; };
 		1721F23B290AC304006CE686 /* ContextMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1721F23A290AC304006CE686 /* ContextMenuView.swift */; };
-		1718C18C2F3648D200540518 /* DetailedFoodView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1718C18B2F3648D200540518 /* DetailedFoodView.swift */; };
-		174A036C290AD37700E925AC /* Mensa Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 1721F210290AC0FC006CE686 /* Mensa Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		1721F24031000100006CE686 /* StudierendenwerkHTMLCanteenMenuDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1721F23D31000100006CE686 /* StudierendenwerkHTMLCanteenMenuDataSource.swift */; };
+		1721F24131000100006CE686 /* CanteenMenuService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1721F23E31000100006CE686 /* CanteenMenuService.swift */; };
+		1721F24231000100006CE686 /* CanteenMenuStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1721F23F31000100006CE686 /* CanteenMenuStore.swift */; };
+		1721F24331000200006CE686 /* CanteenMenuDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1721F24431000200006CE686 /* CanteenMenuDataSource.swift */; };
+		174A036C290AD37700E925AC /* Mensa Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 1721F210290AC0FC006CE686 /* Mensa Watch App.app */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		17582371243B4B4B00465652 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17582370243B4B4B00465652 /* Extensions.swift */; };
 		175A378E290ACAA500EFEA60 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 17731B1724434E0200D2E688 /* Localizable.strings */; };
 		176EEDC12F2E9B5F00AE6423 /* Api.swift in Sources */ = {isa = PBXBuildFile; fileRef = 176EEDC02F2E9B5F00AE6423 /* Api.swift */; };
@@ -35,6 +38,10 @@
 		177174BE237F0C2C003C0C53 /* FoodLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 177174BD237F0C2C003C0C53 /* FoodLine.swift */; };
 		177174C0237F0C55003C0C53 /* Food.swift in Sources */ = {isa = PBXBuildFile; fileRef = 177174BF237F0C55003C0C53 /* Food.swift */; };
 		177174C2237F0FFD003C0C53 /* Canteen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 177174C1237F0FFD003C0C53 /* Canteen.swift */; };
+		177174C33100010003C0C53 /* StudierendenwerkHTMLCanteenMenuDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1721F23D31000100006CE686 /* StudierendenwerkHTMLCanteenMenuDataSource.swift */; };
+		177174C43100010003C0C53 /* CanteenMenuService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1721F23E31000100006CE686 /* CanteenMenuService.swift */; };
+		177174C53100010003C0C53 /* CanteenMenuStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1721F23F31000100006CE686 /* CanteenMenuStore.swift */; };
+		177174C63100020003C0C53 /* CanteenMenuDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1721F24431000200006CE686 /* CanteenMenuDataSource.swift */; };
 		17731B1524434E0200D2E688 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 17731B1724434E0200D2E688 /* Localizable.strings */; };
 		179118F42A0FE1C500A5740B /* NutritionalInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 179118F32A0FE1C500A5740B /* NutritionalInfo.swift */; };
 		179118F52A0FE1C500A5740B /* NutritionalInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 179118F32A0FE1C500A5740B /* NutritionalInfo.swift */; };
@@ -55,9 +62,17 @@
 		17FEA0DC2A0B79C200A2296C /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = 17FEA0DB2A0B79C200A2296C /* SwiftSoup */; };
 		17FEA0DE2A0B9BE700A2296C /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17FEA0DD2A0B9BE700A2296C /* Utilities.swift */; };
 		17FEA0DF2A0B9BE700A2296C /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17FEA0DD2A0B9BE700A2296C /* Utilities.swift */; };
+		2F9793307A76E009A4402BB3 /* WidgetMenuSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B215FEF3CB5D43B1C3DEE75 /* WidgetMenuSnapshot.swift */; };
+		581217ED2182BBFB4FB5C365 /* MensaLineWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B53A112917D20704ED5FD53 /* MensaLineWidget.swift */; };
+		766384FD8140FE76AADA39C3 /* MensaWidgetsBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7ABB039CE5B3FA20414DBEAF /* MensaWidgetsBundle.swift */; };
+		7B77DBE05F90E04BED3911A0 /* WidgetMenuSummaryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9F20FDC0EEBB88DBA8851A9 /* WidgetMenuSummaryService.swift */; };
 		7C9DF9C32FF70ADD00DFD593 /* MensaAppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 7C9DF9C22FF70ADD00DFD593 /* MensaAppIcon.icon */; };
 		7C9DF9C42FF70ADD00DFD593 /* MensaAppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 7C9DF9C22FF70ADD00DFD593 /* MensaAppIcon.icon */; };
+		9E4D6D2A7C4B727FD79CD3CD /* WidgetMenuSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B215FEF3CB5D43B1C3DEE75 /* WidgetMenuSnapshot.swift */; };
+		A476EE0363CEA98AAD685CDA /* MensaOverviewWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7A33EA4688118E8E2BEE9E5 /* MensaOverviewWidget.swift */; };
+		ADA306DD70A5BBCC908D1D41 /* MensaWidgetExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 6956E585DC5D3C12F342A094 /* MensaWidgetExtension.appex */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		BE8CEBC224490C820016F22B /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE8CEBC124490C820016F22B /* Constants.swift */; };
+		D057CCA032C9FFB436FD8DA3 /* WidgetSharedViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79C02837D306565F354D70AF /* WidgetSharedViews.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -67,6 +82,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 1721F20F290AC0FC006CE686;
 			remoteInfo = "Mensa Watch App";
+		};
+		F9A7335E31BB08150B63AD21 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1771744C237F0507003C0C53 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B4CDE50F1E8C77F3FBCA6D84;
+			remoteInfo = MensaWidgetExtension;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -80,6 +102,17 @@
 				174A036C290AD37700E925AC /* Mensa Watch App.app in Embed Watch Content */,
 			);
 			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		684E4955D8988FC97C2EF032 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				ADA306DD70A5BBCC908D1D41 /* MensaWidgetExtension.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -96,7 +129,10 @@
 		1721F236290AC2FF006CE686 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		1721F238290AC302006CE686 /* WatchFoodView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchFoodView.swift; sourceTree = "<group>"; };
 		1721F23A290AC304006CE686 /* ContextMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextMenuView.swift; sourceTree = "<group>"; };
-		1718C18B2F3648D200540518 /* DetailedFoodView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailedFoodView.swift; sourceTree = "<group>"; };
+		1721F23D31000100006CE686 /* StudierendenwerkHTMLCanteenMenuDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudierendenwerkHTMLCanteenMenuDataSource.swift; sourceTree = "<group>"; };
+		1721F23E31000100006CE686 /* CanteenMenuService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanteenMenuService.swift; sourceTree = "<group>"; };
+		1721F23F31000100006CE686 /* CanteenMenuStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanteenMenuStore.swift; sourceTree = "<group>"; };
+		1721F24431000200006CE686 /* CanteenMenuDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanteenMenuDataSource.swift; sourceTree = "<group>"; };
 		17582370243B4B4B00465652 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		175A3793290AD10A00EFEA60 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		176EEDC02F2E9B5F00AE6423 /* Api.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Api.swift; sourceTree = "<group>"; };
@@ -123,7 +159,16 @@
 		17BD30612A0E3BCB00A76CD6 /* ViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModel.swift; sourceTree = "<group>"; };
 		17C0E0002F39BC1200B1A001 /* Credentials.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Credentials.swift; sourceTree = "<group>"; };
 		17FEA0DD2A0B9BE700A2296C /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
+		5B215FEF3CB5D43B1C3DEE75 /* WidgetMenuSnapshot.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WidgetMenuSnapshot.swift; sourceTree = "<group>"; };
+		63C5487C4E963D3334165BFF /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		6956E585DC5D3C12F342A094 /* MensaWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MensaWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		79C02837D306565F354D70AF /* WidgetSharedViews.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WidgetSharedViews.swift; sourceTree = "<group>"; };
+		7ABB039CE5B3FA20414DBEAF /* MensaWidgetsBundle.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MensaWidgetsBundle.swift; sourceTree = "<group>"; };
 		7C9DF9C22FF70ADD00DFD593 /* MensaAppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = MensaAppIcon.icon; sourceTree = "<group>"; };
+		8B53A112917D20704ED5FD53 /* MensaLineWidget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MensaLineWidget.swift; sourceTree = "<group>"; };
+		A3845966DC7B2FAC3206DCA8 /* MensaWidgetExtension.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = MensaWidgetExtension.entitlements; sourceTree = "<group>"; };
+		A7A33EA4688118E8E2BEE9E5 /* MensaOverviewWidget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MensaOverviewWidget.swift; sourceTree = "<group>"; };
+		B9F20FDC0EEBB88DBA8851A9 /* WidgetMenuSummaryService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WidgetMenuSummaryService.swift; sourceTree = "<group>"; };
 		BE8CEBC124490C820016F22B /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -141,6 +186,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				17FEA0DA2A0B796500A2296C /* SwiftSoup in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B10DEF3C7004F83C8020C6F7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -206,9 +258,14 @@
 			children = (
 				176EEDC02F2E9B5F00AE6423 /* Api.swift */,
 				177174B9237F0896003C0C53 /* Repository.swift */,
+				1721F24431000200006CE686 /* CanteenMenuDataSource.swift */,
+				1721F23D31000100006CE686 /* StudierendenwerkHTMLCanteenMenuDataSource.swift */,
+				1721F23E31000100006CE686 /* CanteenMenuService.swift */,
+				1721F23F31000100006CE686 /* CanteenMenuStore.swift */,
 				177174BD237F0C2C003C0C53 /* FoodLine.swift */,
 				177174BF237F0C55003C0C53 /* Food.swift */,
 				179118F32A0FE1C500A5740B /* NutritionalInfo.swift */,
+				5B215FEF3CB5D43B1C3DEE75 /* WidgetMenuSnapshot.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -216,6 +273,7 @@
 		174A036B290AD37700E925AC /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				4B145AA888A7C589A47F41E6 /* iOS */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -245,6 +303,7 @@
 				17717455237F0508003C0C53 /* Products */,
 				174A036B290AD37700E925AC /* Frameworks */,
 				7C9DF9C22FF70ADD00DFD593 /* MensaAppIcon.icon */,
+				5355332373D0753C1916707C /* MensaWidgetExtension */,
 			);
 			sourceTree = "<group>";
 		};
@@ -253,6 +312,7 @@
 			children = (
 				17717454237F0508003C0C53 /* Mensa.app */,
 				1721F210290AC0FC006CE686 /* Mensa Watch App.app */,
+				6956E585DC5D3C12F342A094 /* MensaWidgetExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -288,6 +348,27 @@
 			path = ViewModel;
 			sourceTree = "<group>";
 		};
+		4B145AA888A7C589A47F41E6 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = iOS;
+			sourceTree = "<group>";
+		};
+		5355332373D0753C1916707C /* MensaWidgetExtension */ = {
+			isa = PBXGroup;
+			children = (
+				63C5487C4E963D3334165BFF /* Info.plist */,
+				A3845966DC7B2FAC3206DCA8 /* MensaWidgetExtension.entitlements */,
+				7ABB039CE5B3FA20414DBEAF /* MensaWidgetsBundle.swift */,
+				A7A33EA4688118E8E2BEE9E5 /* MensaOverviewWidget.swift */,
+				8B53A112917D20704ED5FD53 /* MensaLineWidget.swift */,
+				B9F20FDC0EEBB88DBA8851A9 /* WidgetMenuSummaryService.swift */,
+				79C02837D306565F354D70AF /* WidgetSharedViews.swift */,
+			);
+			path = MensaWidgetExtension;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -320,11 +401,13 @@
 				17717452237F0508003C0C53 /* Resources */,
 				177174AE237F050E003C0C53 /* Embed Watch Content */,
 				17731B122443470B00D2E688 /* ShellScript */,
+				684E4955D8988FC97C2EF032 /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 				174A036E290AD37700E925AC /* PBXTargetDependency */,
+				FA7E36EA0357793C44B8E0B2 /* PBXTargetDependency */,
 			);
 			name = Mensa;
 			packageProductDependencies = (
@@ -333,6 +416,23 @@
 			productName = Mensa;
 			productReference = 17717454237F0508003C0C53 /* Mensa.app */;
 			productType = "com.apple.product-type.application";
+		};
+		B4CDE50F1E8C77F3FBCA6D84 /* MensaWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 52854BFCC3D429763C7E4EAB /* Build configuration list for PBXNativeTarget "MensaWidgetExtension" */;
+			buildPhases = (
+				433DBAF05C5F077785DDE475 /* Sources */,
+				B10DEF3C7004F83C8020C6F7 /* Frameworks */,
+				60B6D77933F2AA4EBEACD29D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MensaWidgetExtension;
+			productName = MensaWidgetExtension;
+			productReference = 6956E585DC5D3C12F342A094 /* MensaWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -350,6 +450,9 @@
 					};
 					17717453237F0508003C0C53 = {
 						CreatedOnToolsVersion = 11.2.1;
+					};
+					B4CDE50F1E8C77F3FBCA6D84 = {
+						CreatedOnToolsVersion = 16.0;
 					};
 				};
 			};
@@ -372,6 +475,7 @@
 			targets = (
 				17717453237F0508003C0C53 /* Mensa */,
 				1721F20F290AC0FC006CE686 /* Mensa Watch App */,
+				B4CDE50F1E8C77F3FBCA6D84 /* MensaWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -396,6 +500,13 @@
 				17717461237F050C003C0C53 /* Preview Assets.xcassets in Resources */,
 				7C9DF9C42FF70ADD00DFD593 /* MensaAppIcon.icon in Resources */,
 				1771745E237F050C003C0C53 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		60B6D77933F2AA4EBEACD29D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -432,6 +543,10 @@
 				1721F233290AC21E006CE686 /* Constants.swift in Sources */,
 				17FEA0DF2A0B9BE700A2296C /* Utilities.swift in Sources */,
 				1721F229290AC1E4006CE686 /* PhoneMessaging.swift in Sources */,
+				1721F24331000200006CE686 /* CanteenMenuDataSource.swift in Sources */,
+				1721F24031000100006CE686 /* StudierendenwerkHTMLCanteenMenuDataSource.swift in Sources */,
+				1721F24131000100006CE686 /* CanteenMenuService.swift in Sources */,
+				1721F24231000100006CE686 /* CanteenMenuStore.swift in Sources */,
 				1721F239290AC302006CE686 /* WatchFoodView.swift in Sources */,
 				1721F213290AC0FC006CE686 /* MensaWatchApp.swift in Sources */,
 				1721F23B290AC304006CE686 /* ContextMenuView.swift in Sources */,
@@ -463,6 +578,10 @@
 				17BD30622A0E3BCB00A76CD6 /* ViewModel.swift in Sources */,
 				1718C18C2F3648D200540518 /* DetailedFoodView.swift in Sources */,
 				177174BA237F0896003C0C53 /* Repository.swift in Sources */,
+				177174C63100020003C0C53 /* CanteenMenuDataSource.swift in Sources */,
+				177174C33100010003C0C53 /* StudierendenwerkHTMLCanteenMenuDataSource.swift in Sources */,
+				177174C43100010003C0C53 /* CanteenMenuService.swift in Sources */,
+				177174C53100010003C0C53 /* CanteenMenuStore.swift in Sources */,
 				179399B124449157003A2925 /* ContentView.swift in Sources */,
 				17582371243B4B4B00465652 /* Extensions.swift in Sources */,
 				177174BE237F0C2C003C0C53 /* FoodLine.swift in Sources */,
@@ -470,6 +589,20 @@
 				179118F72A0FF4F800A5740B /* FoodRow.swift in Sources */,
 				176EEDC12F2E9B5F00AE6423 /* Api.swift in Sources */,
 				179399B424449157003A2925 /* TitleBarView.swift in Sources */,
+				9E4D6D2A7C4B727FD79CD3CD /* WidgetMenuSnapshot.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		433DBAF05C5F077785DDE475 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				766384FD8140FE76AADA39C3 /* MensaWidgetsBundle.swift in Sources */,
+				A476EE0363CEA98AAD685CDA /* MensaOverviewWidget.swift in Sources */,
+				581217ED2182BBFB4FB5C365 /* MensaLineWidget.swift in Sources */,
+				7B77DBE05F90E04BED3911A0 /* WidgetMenuSummaryService.swift in Sources */,
+				D057CCA032C9FFB436FD8DA3 /* WidgetSharedViews.swift in Sources */,
+				2F9793307A76E009A4402BB3 /* WidgetMenuSnapshot.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -480,6 +613,12 @@
 			isa = PBXTargetDependency;
 			target = 1721F20F290AC0FC006CE686 /* Mensa Watch App */;
 			targetProxy = 174A036D290AD37700E925AC /* PBXContainerItemProxy */;
+		};
+		FA7E36EA0357793C44B8E0B2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = MensaWidgetExtension;
+			target = B4CDE50F1E8C77F3FBCA6D84 /* MensaWidgetExtension */;
+			targetProxy = F9A7335E31BB08150B63AD21 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -496,6 +635,38 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		136FCCC975CB483A3381DD38 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_ENTITLEMENTS = MensaWidgetExtension/MensaWidgetExtension.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6DCQ69GP5G;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = MensaWidgetExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 2;
+				PRODUCT_BUNDLE_IDENTIFIER = edu.teco.ilteen.Mensa.WidgetExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) WIDGET_EXTENSION";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 		1721F21C290AC0FC006CE686 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -505,7 +676,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Mensa Watch App/Preview Content\"";
-				DEVELOPMENT_TEAM = ACWKKDLK2R;
+				DEVELOPMENT_TEAM = 6DCQ69GP5G;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "Mensa Watch App/Info.plist";
@@ -518,7 +689,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.23;
-				PRODUCT_BUNDLE_IDENTIFIER = com.ilteen.Mensa.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = edu.teco.ilteen.Mensa.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -538,7 +709,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Mensa Watch App/Preview Content\"";
-				DEVELOPMENT_TEAM = ACWKKDLK2R;
+				DEVELOPMENT_TEAM = 6DCQ69GP5G;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "Mensa Watch App/Info.plist";
@@ -551,7 +722,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.23;
-				PRODUCT_BUNDLE_IDENTIFIER = com.ilteen.Mensa.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = edu.teco.ilteen.Mensa.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -686,13 +857,17 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = MensaAppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = Mensa/Mensa.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Mensa/Preview Content\"";
-				DEVELOPMENT_TEAM = ACWKKDLK2R;
+				DEVELOPMENT_TEAM = 6DCQ69GP5G;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = Mensa/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.food-and-drink";
@@ -702,11 +877,15 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 2;
-				PRODUCT_BUNDLE_IDENTIFIER = com.ilteen.Mensa;
+				PRODUCT_BUNDLE_IDENTIFIER = edu.teco.ilteen.Mensa;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
+				REGISTER_APP_GROUPS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator xros xrsimulator";
 				SUPPORTS_MACCATALYST = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,6,7";
 			};
@@ -716,13 +895,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = MensaAppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = Mensa/Mensa.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Mensa/Preview Content\"";
-				DEVELOPMENT_TEAM = ACWKKDLK2R;
+				DEVELOPMENT_TEAM = 6DCQ69GP5G;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = Mensa/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.food-and-drink";
@@ -732,18 +912,51 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 2;
-				PRODUCT_BUNDLE_IDENTIFIER = com.ilteen.Mensa;
+				PRODUCT_BUNDLE_IDENTIFIER = edu.teco.ilteen.Mensa;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
+				REGISTER_APP_GROUPS = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator xros xrsimulator";
 				SUPPORTS_MACCATALYST = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,6,7";
 			};
 			name = Release;
+		};
+		5EAE29D1B6BD942DBC451D2C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_ENTITLEMENTS = MensaWidgetExtension/MensaWidgetExtension.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6DCQ69GP5G;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = MensaWidgetExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 2;
+				PRODUCT_BUNDLE_IDENTIFIER = edu.teco.ilteen.Mensa.WidgetExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) WIDGET_EXTENSION";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
 		};
 /* End XCBuildConfiguration section */
 
@@ -771,6 +984,15 @@
 			buildConfigurations = (
 				177174B0237F050E003C0C53 /* Debug */,
 				177174B1237F050E003C0C53 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		52854BFCC3D429763C7E4EAB /* Build configuration list for PBXNativeTarget "MensaWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				136FCCC975CB483A3381DD38 /* Release */,
+				5EAE29D1B6BD942DBC451D2C /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
