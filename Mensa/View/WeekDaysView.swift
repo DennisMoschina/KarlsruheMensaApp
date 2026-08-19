@@ -95,8 +95,8 @@ struct WeekDaysView: View {
     }
 }
 
-struct WeekDays_Previews: PreviewProvider {
-    static var previews: some View {
-        WeekDaysView(selection: .constant(0))
-    }
+#Preview {
+    @Previewable @State var weekDaySelection: Int = 0
+
+    WeekDaysView(selection: $weekDaySelection)
 }

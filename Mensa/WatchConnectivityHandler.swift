@@ -34,12 +34,6 @@ final class WatchConnectivityHandler: NSObject, CanteenDataSyncing {
             AppLog.connectivity.info("Activating watch connectivity session")
             self.session.activate()
         }
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(handleRepositoryCanteenUpdate(_:)),
-            name: .repositoryDidUpdateCanteenData,
-            object: nil
-        )
     }
     
     /// Sends full canteen data immediately or queues it for later delivery.

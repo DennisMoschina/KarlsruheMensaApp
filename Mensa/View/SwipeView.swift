@@ -66,15 +66,15 @@ struct SwipeView: View {
     }
 }
 
-struct SwipeView_Previews: PreviewProvider {
-    static var previews: some View {
-        let viewModel = ViewModel()
-        let repository = Repository()
-        let menuService = CanteenMenuService(repository: repository)
+#Preview {
+    @Previewable @State var daySelection = 0
 
-        SwipeView(daySelection: .constant(0))
-            .environment(viewModel)
-            .environment(\.repository, repository)
-            .environment(\.menuService, menuService)
-    }
+    let viewModel = ViewModel()
+    let repository = Repository()
+    let menuService = CanteenMenuService(repository: repository)
+
+    SwipeView(daySelection: $daySelection)
+        .environment(viewModel)
+        .environment(\.repository, repository)
+        .environment(\.menuService, menuService)
 }

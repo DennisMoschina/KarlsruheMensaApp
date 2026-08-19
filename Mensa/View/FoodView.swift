@@ -44,14 +44,6 @@ struct FoodView: View {
                     Section(header: Text(foodLine.name + Constants.DASH + Constants.FOOD_LINE_CLOSED)) {
                         ClosedRow(info: Constants.DASH)
                     }
-                }
-            }
-            
-            ForEach(closedFoodLines) { foodLine in
-                if foodLine.foods.isEmpty {
-                    Section(header: Text(foodLine.name + Constants.DASH + Constants.FOOD_LINE_CLOSED)) {
-                        ClosedRow(info: Constants.DASH)
-                    }
                 } else {
                     Section(header: Text(foodLine.name)) {
                         ClosedRow(info: foodLine.closingText)

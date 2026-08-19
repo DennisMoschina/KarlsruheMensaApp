@@ -47,15 +47,14 @@ struct ContentView: View {
         .onLongPressGesture {
             showDatePicker = !showDatePicker;
         }
-        .alert(Constants.NO_INTERNET, isPresented: self.$viewModel.showAlert) {
-            Button(Constants.TRY_AGAIN) {
-                phoneMessaging.requestCanteenDataFromPhone()
-                self.viewModel.showAlert = false
-            }
-            Button("OK", role: .cancel) {}
-        } message: {
-            Text(Constants.CONNECT)
-        }
+        //TODO: not working ATM
+//        .alert(isPresented: self.$viewModel.showAlert) {
+//            Alert(title: Text(Constants.NO_INTERNET), message: Text(Constants.CONNECT), dismissButton: Alert.Button.default(
+//                Text(Constants.TRY_AGAIN), action:  {
+//                    self.viewModel.showAlert = false
+//                    exit(-1)
+//                }))
+//        }
     }
 }
 

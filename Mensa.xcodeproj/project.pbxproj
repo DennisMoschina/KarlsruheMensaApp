@@ -59,8 +59,6 @@
 		179399B424449157003A2925 /* TitleBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 179399AE24449157003A2925 /* TitleBarView.swift */; };
 		17BD30622A0E3BCB00A76CD6 /* ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17BD30612A0E3BCB00A76CD6 /* ViewModel.swift */; };
 		17BD30632A0E3BCB00A76CD6 /* ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17BD30612A0E3BCB00A76CD6 /* ViewModel.swift */; };
-		17C0E0012F39BC1200B1A001 /* Credentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17C0E0002F39BC1200B1A001 /* Credentials.swift */; };
-		17C0E0032F39BC1500B1A001 /* Credentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17C0E0002F39BC1200B1A001 /* Credentials.swift */; };
 		17FEA0DA2A0B796500A2296C /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = 17FEA0D92A0B796500A2296C /* SwiftSoup */; };
 		17FEA0DC2A0B79C200A2296C /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = 17FEA0DB2A0B79C200A2296C /* SwiftSoup */; };
 		17FEA0DE2A0B9BE700A2296C /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17FEA0DD2A0B9BE700A2296C /* Utilities.swift */; };
@@ -161,7 +159,6 @@
 		179399AD24449157003A2925 /* SwipeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwipeView.swift; sourceTree = "<group>"; };
 		179399AE24449157003A2925 /* TitleBarView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TitleBarView.swift; sourceTree = "<group>"; };
 		17BD30612A0E3BCB00A76CD6 /* ViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModel.swift; sourceTree = "<group>"; };
-		17C0E0002F39BC1200B1A001 /* Credentials.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Credentials.swift; sourceTree = "<group>"; };
 		17FEA0DD2A0B9BE700A2296C /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
 		5B215FEF3CB5D43B1C3DEE75 /* WidgetMenuSnapshot.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WidgetMenuSnapshot.swift; sourceTree = "<group>"; };
 		63C5487C4E963D3334165BFF /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -237,7 +234,6 @@
 		1721F23D290AC36F006CE686 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
-				17C0E0002F39BC1200B1A001 /* Credentials.swift */,
 				17FEA0DD2A0B9BE700A2296C /* Utilities.swift */,
 				BE8CEBC124490C820016F22B /* Constants.swift */,
 				17582370243B4B4B00465652 /* Extensions.swift */,
@@ -286,7 +282,6 @@
 		1758CA98243C970200919C07 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				1718C18B2F3648D200540518 /* DetailedFoodView.swift */,
 				179399AB24449157003A2925 /* ContentView.swift */,
 				179399A924449157003A2925 /* FoodView.swift */,
 				179399AA24449157003A2925 /* WeekDaysView.swift */,
@@ -533,7 +528,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "TAGS=\"TODO:|FIXME:\"\nERRORTAG=\"ERROR:\"\nexport LC_ALL=C\nexport LANG=C\nfind \"${SRCROOT}\" \\( -name \"*.h\" -or -name \"*.m\" -or -name \"*.swift\" \\) -print0 | xargs -0 egrep --with-filename --line-number --only-matching \"($TAGS).*\\$|($ERRORTAG).*\\$\" | perl -p -e \"s/($TAGS)/ warning: \\$1/\" | perl -p -e \"s/($ERRORTAG)/ error: \\$1/\"\n";
+			shellScript = "TAGS=\"TODO:|FIXME:\"\nERRORTAG=\"ERROR:\"\nfind \"${SRCROOT}\" \\( -name \"*.h\" -or -name \"*.m\" -or -name \"*.swift\" \\) -print0 | xargs -0 egrep --with-filename --line-number --only-matching \"($TAGS).*\\$|($ERRORTAG).*\\$\" | perl -p -e \"s/($TAGS)/ warning: \\$1/\" | perl -p -e \"s/($ERRORTAG)/ error: \\$1/\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
