@@ -8,6 +8,7 @@
 
 import Foundation
 import Observation
+import OSLog
 import WatchConnectivity
 
 /// Receives canteen and settings updates from the paired iPhone.
@@ -29,6 +30,7 @@ final class PhoneMessaging: NSObject {
         super.init()
         self.session.delegate = self
         self.session.activate()
+        AppLog.connectivity.info("Activated phone messaging session on watch")
         
         self.canteenSelection = UserDefaults.standard.integer(forKey: Constants.KEY_CHOSEN_CANTEEN)
         self.priceGroup = UserDefaults.standard.integer(forKey: Constants.KEY_CHOSEN_PRICE_GROUP)
@@ -36,10 +38,15 @@ final class PhoneMessaging: NSObject {
 
     /// Requests the latest canteen payload from the paired iPhone.
     func requestCanteenDataFromPhone() {
-        guard self.session.activationState == .activated else { return }
+        guard self.session.activationState == .activated else {
+            AppLog.connectivity.warning("Skipped canteen data request because watch session is not activated")
+            return
+        }
         if self.session.isReachable {
+            AppLog.connectivity.info("Requesting canteen data from reachable phone")
             self.session.sendMessage(["requestCanteenData": true], replyHandler: nil)
         } else {
+            AppLog.connectivity.info("Phone not reachable; queuing canteen data request")
             self.session.transferUserInfo(["requestCanteenData": true])
         }
     }
@@ -48,7 +55,11 @@ final class PhoneMessaging: NSObject {
 extension PhoneMessaging: WCSessionDelegate {
     /// Handles watch connectivity activation completion.
     func session(_: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
-        debugPrint("WCSession activationDidCompleteWith activationState:\(activationState) error:\(String(describing: error))")
+        if let error {
+            AppLog.connectivity.error("Phone messaging activation failed: \(error.localizedDescription, privacy: .public)")
+        } else {
+            AppLog.connectivity.info("Phone messaging activated with state \(activationState.rawValue)")
+        }
     }
 
 #if os(iOS)
@@ -63,24 +74,23 @@ extension PhoneMessaging: WCSessionDelegate {
             if let newCanteenSelection = message["canteenSelection"] as? Int {
                 self.canteenSelection = newCanteenSelection
                 UserDefaults.standard.set(newCanteenSelection, forKey: Constants.KEY_CHOSEN_CANTEEN)
-                print("updated canteen selection!")
-                print("new selection: \(newCanteenSelection)")
+                AppLog.connectivity.info("Received canteen selection \(newCanteenSelection) from phone message")
             }
             
             if let canteenData = message["canteen"] as? Data {
                 do {
                     let canteen = try JSONDecoder().decode(Canteen.self, from: canteenData)
                     self.viewModel.canteen = canteen
+                    AppLog.connectivity.info("Received canteen payload from phone message with \(canteenData.count) bytes")
                 } catch {
-                    print("Failed to decode canteen data: \(error)")
+                    AppLog.connectivity.error("Failed to decode canteen data from phone message: \(error.localizedDescription, privacy: .public)")
                 }
             }
             
             if let newPriceGroup = message["priceGroup"] as? Int {
                 self.priceGroup = newPriceGroup
                 UserDefaults.standard.set(newPriceGroup, forKey: Constants.KEY_CHOSEN_PRICE_GROUP)
-                print("updated price group!")
-                print("new selection: \(newPriceGroup)")
+                AppLog.connectivity.info("Received price group \(newPriceGroup) from phone message")
             }
         }
     }
@@ -91,22 +101,23 @@ extension PhoneMessaging: WCSessionDelegate {
             if let newCanteenSelection = userInfo["canteenSelection"] as? Int {
                 UserDefaults.standard.set(newCanteenSelection, forKey: Constants.KEY_CHOSEN_CANTEEN)
                 self.canteenSelection = newCanteenSelection
+                AppLog.connectivity.info("Received queued canteen selection \(newCanteenSelection)")
             }
             
             if let canteenData = userInfo["canteen"] as? Data {
                 do {
                     let canteen = try JSONDecoder().decode(Canteen.self, from: canteenData)
                     self.viewModel.canteen = canteen
+                    AppLog.connectivity.info("Received queued canteen payload with \(canteenData.count) bytes")
                 } catch {
-                    print("Failed to decode canteen data: \(error)")
+                    AppLog.connectivity.error("Failed to decode queued canteen data: \(error.localizedDescription, privacy: .public)")
                 }
             }
             
             if let newPriceGroup = userInfo["priceGroup"] as? Int {
                 self.priceGroup = newPriceGroup
                 UserDefaults.standard.set(newPriceGroup, forKey: Constants.KEY_CHOSEN_PRICE_GROUP)
-                print("updated price group!")
-                print("new selection: \(newPriceGroup)")
+                AppLog.connectivity.info("Received queued price group \(newPriceGroup)")
             }
         }
     }

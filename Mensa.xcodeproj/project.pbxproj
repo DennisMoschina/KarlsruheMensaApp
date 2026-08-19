@@ -27,6 +27,9 @@
 		1721F24131000100006CE686 /* CanteenMenuService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1721F23E31000100006CE686 /* CanteenMenuService.swift */; };
 		1721F24231000100006CE686 /* CanteenMenuStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1721F23F31000100006CE686 /* CanteenMenuStore.swift */; };
 		1721F24331000200006CE686 /* CanteenMenuDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1721F24431000200006CE686 /* CanteenMenuDataSource.swift */; };
+		1721F24531000300006CE686 /* AppLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1721F24831000300006CE686 /* AppLogger.swift */; };
+		1721F24631000300006CE686 /* AppLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1721F24831000300006CE686 /* AppLogger.swift */; };
+		1721F24731000300006CE686 /* AppLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1721F24831000300006CE686 /* AppLogger.swift */; };
 		174A036C290AD37700E925AC /* Mensa Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 1721F210290AC0FC006CE686 /* Mensa Watch App.app */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		17582371243B4B4B00465652 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17582370243B4B4B00465652 /* Extensions.swift */; };
 		175A378E290ACAA500EFEA60 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 17731B1724434E0200D2E688 /* Localizable.strings */; };
@@ -133,6 +136,7 @@
 		1721F23E31000100006CE686 /* CanteenMenuService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanteenMenuService.swift; sourceTree = "<group>"; };
 		1721F23F31000100006CE686 /* CanteenMenuStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanteenMenuStore.swift; sourceTree = "<group>"; };
 		1721F24431000200006CE686 /* CanteenMenuDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanteenMenuDataSource.swift; sourceTree = "<group>"; };
+		1721F24831000300006CE686 /* AppLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLogger.swift; sourceTree = "<group>"; };
 		17582370243B4B4B00465652 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		175A3793290AD10A00EFEA60 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		176EEDC02F2E9B5F00AE6423 /* Api.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Api.swift; sourceTree = "<group>"; };
@@ -237,6 +241,7 @@
 				17FEA0DD2A0B9BE700A2296C /* Utilities.swift */,
 				BE8CEBC124490C820016F22B /* Constants.swift */,
 				17582370243B4B4B00465652 /* Extensions.swift */,
+				1721F24831000300006CE686 /* AppLogger.swift */,
 				1721F23F290AC39A006CE686 /* Model */,
 				1721F23E290AC38B006CE686 /* View */,
 				17DEEF5D2448AF4E003A8CBE /* ViewModel */,
@@ -547,6 +552,7 @@
 				1721F24031000100006CE686 /* StudierendenwerkHTMLCanteenMenuDataSource.swift in Sources */,
 				1721F24131000100006CE686 /* CanteenMenuService.swift in Sources */,
 				1721F24231000100006CE686 /* CanteenMenuStore.swift in Sources */,
+				1721F24531000300006CE686 /* AppLogger.swift in Sources */,
 				1721F239290AC302006CE686 /* WatchFoodView.swift in Sources */,
 				1721F213290AC0FC006CE686 /* MensaWatchApp.swift in Sources */,
 				1721F23B290AC304006CE686 /* ContextMenuView.swift in Sources */,
@@ -582,6 +588,7 @@
 				177174C33100010003C0C53 /* StudierendenwerkHTMLCanteenMenuDataSource.swift in Sources */,
 				177174C43100010003C0C53 /* CanteenMenuService.swift in Sources */,
 				177174C53100010003C0C53 /* CanteenMenuStore.swift in Sources */,
+				1721F24631000300006CE686 /* AppLogger.swift in Sources */,
 				179399B124449157003A2925 /* ContentView.swift in Sources */,
 				17582371243B4B4B00465652 /* Extensions.swift in Sources */,
 				177174BE237F0C2C003C0C53 /* FoodLine.swift in Sources */,
@@ -603,6 +610,7 @@
 				7B77DBE05F90E04BED3911A0 /* WidgetMenuSummaryService.swift in Sources */,
 				D057CCA032C9FFB436FD8DA3 /* WidgetSharedViews.swift in Sources */,
 				2F9793307A76E009A4402BB3 /* WidgetMenuSnapshot.swift in Sources */,
+				1721F24731000300006CE686 /* AppLogger.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

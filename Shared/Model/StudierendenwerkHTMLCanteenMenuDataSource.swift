@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import OSLog
 import SwiftSoup
 
 /// HTML-backed canteen source for the Studierendenwerk Karlsruhe menu website.
@@ -39,10 +40,12 @@ final class StudierendenwerkHTMLCanteenMenuDataSource: CanteenMenuDataSource {
         completion: @escaping ([Int: [FoodLine]]) -> Void
     ) {
         guard !requestedDays.isEmpty else {
+            AppLog.network.info("Skipping menu request because no days were requested")
             completion([:])
             return
         }
 
+        AppLog.network.info("Loading \(requestedDays.count) menu days for \(canteenSelection.rawValue, privacy: .public)")
         let dispatchGroup = DispatchGroup()
         let mergeQueue = DispatchQueue(label: "StudierendenwerkHTMLCanteenMenuDataSource.merge")
         var mergedFoodMap: [Int: [FoodLine]] = [:]
@@ -64,6 +67,7 @@ final class StudierendenwerkHTMLCanteenMenuDataSource: CanteenMenuDataSource {
         }
 
         dispatchGroup.notify(queue: .main) {
+            AppLog.network.info("Finished loading menu with \(mergedFoodMap.count) populated days for \(canteenSelection.rawValue, privacy: .public)")
             completion(mergedFoodMap)
         }
     }
@@ -72,6 +76,7 @@ final class StudierendenwerkHTMLCanteenMenuDataSource: CanteenMenuDataSource {
         imageCacheQueue.sync {
             imageCache.removeAll()
         }
+        AppLog.network.debug("Cleared transient meal image cache")
     }
 
     private func parseCanteenDataFromWebsite(
@@ -85,12 +90,13 @@ final class StudierendenwerkHTMLCanteenMenuDataSource: CanteenMenuDataSource {
         let calendar = Calendar.current
         let weekNumber = calendar.component(.weekOfYear, from: weekDate)
         let url = getURL(weekNumber: weekNumber, canteen: canteenSelection)
+        AppLog.network.debug("Requesting menu week \(weekNumber) for \(canteenSelection.rawValue, privacy: .public)")
 
         let task = URLSession.shared.dataTask(with: url) { data, _, _ in
             var parsedFoodMap: [Int: [FoodLine]] = [:]
 
             guard let data, let html = String(data: data, encoding: .utf8) else {
-                print("Unable to convert data to HTML string")
+                AppLog.network.error("Unable to convert canteen response to HTML for \(canteenSelection.rawValue, privacy: .public), week \(weekNumber)")
                 completion([:])
                 return
             }
@@ -119,9 +125,9 @@ final class StudierendenwerkHTMLCanteenMenuDataSource: CanteenMenuDataSource {
                     }
                 }
             } catch Exception.Error(_, let message) {
-                print(message)
+                AppLog.network.error("SwiftSoup failed to parse canteen HTML: \(message, privacy: .public)")
             } catch {
-                print("error")
+                AppLog.network.error("Failed to parse canteen HTML: \(error.localizedDescription, privacy: .public)")
             }
 
             self.enrichFoodMapWithMealDetails(
@@ -296,6 +302,7 @@ final class StudierendenwerkHTMLCanteenMenuDataSource: CanteenMenuDataSource {
     }
 
     private func fetchMealDetailsForDay(date: String, canteenSelection: Canteens, completion: @escaping ([String: [MealDetails]]) -> Void) {
+        AppLog.network.debug("Requesting meal metadata for \(canteenSelection.rawValue, privacy: .public) on \(date, privacy: .public)")
         let query = """
         query GetMealPlanForDay($date: NaiveDate!) {\n  getCanteens {\n    id\n    name\n    lines {\n      id\n      name\n      meals(date: $date) {\n        id\n        name\n        ratings {\n          averageRating\n          ratingsCount\n          personalRating\n          __typename\n        }\n        images {\n          id\n          url\n          __typename\n        }\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n  __typename\n}\n
 """
@@ -308,6 +315,7 @@ final class StudierendenwerkHTMLCanteenMenuDataSource: CanteenMenuDataSource {
         ]
 
         guard let jsonData = try? JSONSerialization.data(withJSONObject: body, options: []) else {
+            AppLog.network.error("Failed to encode meal metadata request for \(date, privacy: .public)")
             completion([:])
             return
         }
@@ -319,11 +327,13 @@ final class StudierendenwerkHTMLCanteenMenuDataSource: CanteenMenuDataSource {
                   let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
                   let dataObj = json["data"] as? [String: Any],
                   let canteens = dataObj["getCanteens"] as? [[String: Any]] else {
+                AppLog.network.error("Failed to decode meal metadata response for \(date, privacy: .public)")
                 completion([:])
                 return
             }
 
             guard let selectedCanteen = self.selectedCanteen(from: canteens, canteenSelection: canteenSelection) else {
+                AppLog.network.warning("Meal metadata response did not contain \(canteenSelection.rawValue, privacy: .public)")
                 completion([:])
                 return
             }

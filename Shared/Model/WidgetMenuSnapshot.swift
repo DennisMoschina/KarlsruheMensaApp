@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import OSLog
 
 /// Compact, immutable menu data written by the app and consumed by WidgetKit.
 struct WidgetMenuSnapshot: Codable {
@@ -88,13 +89,25 @@ enum WidgetMenuSnapshotStore {
 
         guard let data = try? JSONEncoder().encode(snapshot) else { return }
         defaults.set(data, forKey: snapshotKey)
+        AppLog.widgets.info("Saved widget snapshot for \(snapshot.canteenName, privacy: .public) with \(snapshot.days.count) days")
     }
 #endif
 
     /// Loads the most recent widget snapshot written by the main app.
     static func load() -> WidgetMenuSnapshot? {
-        guard let data = defaults.data(forKey: snapshotKey) else { return nil }
-        return try? JSONDecoder().decode(WidgetMenuSnapshot.self, from: data)
+        guard let data = defaults.data(forKey: snapshotKey) else {
+            AppLog.widgets.debug("No widget snapshot found")
+            return nil
+        }
+
+        do {
+            let snapshot = try JSONDecoder().decode(WidgetMenuSnapshot.self, from: data)
+            AppLog.widgets.debug("Loaded widget snapshot for \(snapshot.canteenName, privacy: .public)")
+            return snapshot
+        } catch {
+            AppLog.widgets.error("Failed to decode widget snapshot: \(error.localizedDescription, privacy: .public)")
+            return nil
+        }
     }
 
     private static var defaults: UserDefaults {

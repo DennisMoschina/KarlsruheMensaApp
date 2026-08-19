@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import OSLog
 #if canImport(WidgetKit)
 import WidgetKit
 #endif
@@ -46,6 +47,7 @@ final class CanteenMenuService {
 
     /// Loads stored menu data immediately and refreshes it from the active source in the background.
     func load(refetch: Bool = false, viewModel: ViewModel, dataSyncer: CanteenDataSyncing? = nil) {
+        AppLog.menu.info("Loading menu for \(viewModel.canteenSelection.rawValue, privacy: .public), refetch: \(refetch)")
         let requestedDates = getNextWorkingDays(date: Date(), count: totalDaysToFetch)
         store.deletePastEntries(before: Date())
 
@@ -54,6 +56,11 @@ final class CanteenMenuService {
                 for: viewModel.canteenSelection,
                 requestedDates: requestedDates
             )
+            if viewModel.canteen != nil {
+                AppLog.menu.info("Loaded cached menu for \(viewModel.canteenSelection.rawValue, privacy: .public)")
+            } else {
+                AppLog.menu.info("No cached menu available for \(viewModel.canteenSelection.rawValue, privacy: .public)")
+            }
         }
 
         if viewModel.canteen != nil {
@@ -71,6 +78,7 @@ final class CanteenMenuService {
             updating: canteenToUpdate,
             resetSourceCache: refetch || !hasVisibleMenu
         ) { canteen in
+            AppLog.menu.info("Fetched menu for \(canteen.name, privacy: .public) with \(canteen.foodOnDayX.count) populated days")
             viewModel.canteen = canteen
             viewModel.loading = false
             self.store.save(canteen)
@@ -83,9 +91,11 @@ final class CanteenMenuService {
 struct DefaultCanteenMenuPublisher: CanteenMenuPublishing {
     func publish(canteen: Canteen, settings: ViewModel, dataSyncer: CanteenDataSyncing?) {
 #if os(iOS)
+        AppLog.menu.info("Publishing menu for \(canteen.name, privacy: .public) to widgets and companion sync")
         WidgetMenuSnapshotStore.save(canteen: canteen, settings: settings)
 #if canImport(WidgetKit)
         WidgetCenter.shared.reloadAllTimelines()
+        AppLog.widgets.info("Requested WidgetKit timeline reload")
 #endif
         dataSyncer?.sendCanteenData(canteen: canteen, priceGroup: settings.priceGroupSelection)
 #endif

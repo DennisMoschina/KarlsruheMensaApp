@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import OSLog
 
 /// Assembles canteen menu payloads from an injectable data source and owns API mutations.
 final class Repository {
@@ -25,6 +26,7 @@ final class Repository {
         resetSourceCache: Bool,
         completion: @escaping (Canteen) -> Void
     ) {
+        AppLog.menu.info("Fetching menu payload for \(canteenSelection.rawValue, privacy: .public), reset source cache: \(resetSourceCache)")
         if resetSourceCache {
             dataSource.resetTransientCache()
         }
@@ -38,6 +40,7 @@ final class Repository {
         dataSource.loadMenuLines(for: requestedDays, canteenSelection: canteenSelection) { foodMap in
             DispatchQueue.main.async {
                 if let canteen {
+                    AppLog.menu.debug("Merging \(foodMap.count) fetched menu days into existing canteen payload")
                     canteen.foodOnDayX.merge(foodMap) { _, new in new }
                     canteen.dateOfLastFetching = now
                     canteen.nextOpenDays = requestedDates
@@ -58,10 +61,12 @@ final class Repository {
     /// Persists a user rating for one meal.
     func rateMeal(_ food: Food, rating: Int, completion: @escaping (Bool) -> Void) {
         guard let mealID = food.apiMealID else {
+            AppLog.meals.warning("Skipping meal rating because the meal has no API id")
             completion(false)
             return
         }
 
+        AppLog.meals.info("Submitting meal rating \(rating) for meal \(mealID, privacy: .private)")
         let mutation = """
         mutation SetRating($mealId: UUID!, $stars: Int) {\n  setRating(mealId: $mealId, stars: $stars)\n}\n
 """
@@ -78,6 +83,7 @@ final class Repository {
         ]
 
         guard let jsonData = try? JSONSerialization.data(withJSONObject: body, options: []) else {
+            AppLog.meals.error("Failed to encode meal rating request for meal \(mealID, privacy: .private)")
             completion(false)
             return
         }
@@ -89,6 +95,7 @@ final class Repository {
                   let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
                   let dataObj = json["data"] as? [String: Any],
                   let success = dataObj["setRating"] as? Bool else {
+                AppLog.meals.error("Failed to decode meal rating response for meal \(mealID, privacy: .private)")
                 DispatchQueue.main.async {
                     completion(false)
                 }
@@ -96,6 +103,7 @@ final class Repository {
             }
 
             DispatchQueue.main.async {
+                AppLog.meals.info("Meal rating request completed with success: \(success)")
                 completion(success)
             }
         }.resume()
@@ -103,6 +111,7 @@ final class Repository {
 
     //TODO: implement
     func uploadImage(food: Food, imageData: Data, completion: @escaping (Bool) -> Void) {
+        AppLog.meals.warning("Meal image upload requested before upload API is implemented")
         // Placeholder until upload API endpoints are wired in.
         DispatchQueue.main.async {
             completion(false)

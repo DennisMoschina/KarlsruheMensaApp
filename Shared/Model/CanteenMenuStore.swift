@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import OSLog
 import SwiftData
 
 /// Persistent storage for upcoming canteen menu days.
@@ -65,7 +66,7 @@ final class SwiftDataCanteenMenuStore: CanteenMenuStoring {
             }
             try context.save()
         } catch {
-            print("Failed to delete past canteen menu days: \(error)")
+            AppLog.storage.error("Failed to delete past canteen menu days: \(error.localizedDescription, privacy: .public)")
         }
     }
 
@@ -110,6 +111,7 @@ final class SwiftDataCanteenMenuStore: CanteenMenuStoring {
                 return nil
             }
 
+            AppLog.storage.info("Loaded \(foodOnDayX.count) cached menu days for \(canteenName, privacy: .public)")
             let canteen = Canteen(
                 name: canteenName,
                 foodOnDayX: foodOnDayX,
@@ -118,13 +120,14 @@ final class SwiftDataCanteenMenuStore: CanteenMenuStoring {
             canteen.nextOpenDays = requestedDates
             return canteen
         } catch {
-            print("Failed to load stored canteen menu days: \(error)")
+            AppLog.storage.error("Failed to load stored canteen menu days: \(error.localizedDescription, privacy: .public)")
             return nil
         }
     }
 
     func save(_ canteen: Canteen) {
         let encoder = JSONEncoder()
+        var savedDayCount = 0
 
         for (index, foodLines) in canteen.foodOnDayX {
             guard canteen.nextOpenDays.indices.contains(index),
@@ -155,15 +158,17 @@ final class SwiftDataCanteenMenuStore: CanteenMenuStoring {
                         )
                     )
                 }
+                savedDayCount += 1
             } catch {
-                print("Failed to upsert stored canteen menu day: \(error)")
+                AppLog.storage.error("Failed to upsert stored canteen menu day: \(error.localizedDescription, privacy: .public)")
             }
         }
 
         do {
             try context.save()
+            AppLog.storage.info("Saved \(savedDayCount) cached menu days for \(canteen.name, privacy: .public)")
         } catch {
-            print("Failed to save stored canteen menu days: \(error)")
+            AppLog.storage.error("Failed to save stored canteen menu days: \(error.localizedDescription, privacy: .public)")
         }
     }
 
@@ -175,7 +180,7 @@ final class SwiftDataCanteenMenuStore: CanteenMenuStoring {
         do {
             return try ModelContainer(for: StoredCanteenMenuDay.self)
         } catch {
-            print("Failed to create persistent SwiftData menu store: \(error)")
+            AppLog.storage.fault("Failed to create persistent SwiftData menu store: \(error.localizedDescription, privacy: .public)")
             let configuration = ModelConfiguration(isStoredInMemoryOnly: true)
             return try! ModelContainer(for: StoredCanteenMenuDay.self, configurations: configuration)
         }

@@ -8,6 +8,7 @@
 
 import Foundation
 import Observation
+import OSLog
 import WatchConnectivity
 
 /// Handles outgoing updates from the iOS app to the companion watch app.
@@ -30,6 +31,7 @@ final class WatchConnectivityHandler: NSObject, CanteenDataSyncing {
         super.init()
         self.session.delegate = self
         if session.activationState != .activated {
+            AppLog.connectivity.info("Activating watch connectivity session")
             self.session.activate()
         }
         NotificationCenter.default.addObserver(
@@ -44,13 +46,18 @@ final class WatchConnectivityHandler: NSObject, CanteenDataSyncing {
     func sendCanteenData(canteen: Canteen, priceGroup: Int) {
         if self.session.isReachable {
             if let encodedData = try? JSONEncoder().encode(canteen) {
+                AppLog.connectivity.info("Sending canteen payload to watch with \(encodedData.count) bytes")
                 self.session.sendMessage(["canteen" : encodedData, "priceGroup" : priceGroup], replyHandler: nil)
+            } else {
+                AppLog.connectivity.error("Failed to encode canteen payload for watch")
             }
         }
         else {
-            print("Watch App not reachable! Transfering user info...")
+            AppLog.connectivity.info("Watch app not reachable; transferring canteen payload as user info")
             if let encodedData = try? JSONEncoder().encode(canteen) {
                 self.session.transferUserInfo(["canteen" : encodedData, "priceGroup" : priceGroup])
+            } else {
+                AppLog.connectivity.error("Failed to encode canteen payload for queued watch transfer")
             }
         }
     }
@@ -58,15 +65,17 @@ final class WatchConnectivityHandler: NSObject, CanteenDataSyncing {
     /// Sends a price-group-only update.
     func sendPriceGroup(_ priceGroup: Int) {
         if self.session.isReachable {
+            AppLog.connectivity.info("Sending price group \(priceGroup) to watch")
             self.session.sendMessage(["priceGroup" : priceGroup], replyHandler: nil)
         }
         else {
-            print("Watch App not reachable! Transfering user info...")
+            AppLog.connectivity.info("Watch app not reachable; transferring price group \(priceGroup) as user info")
             self.session.transferUserInfo(["priceGroup" : priceGroup])
         }
     }
     
     private func refreshAndSendCanteenDataToWatch() {
+        AppLog.connectivity.info("Refreshing canteen data after watch request")
         menuService.load(viewModel: viewModel, dataSyncer: self)
     }
 }
@@ -74,24 +83,29 @@ final class WatchConnectivityHandler: NSObject, CanteenDataSyncing {
 extension WatchConnectivityHandler: WCSessionDelegate {
     
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
-        debugPrint("WCSession activationDidCompleteWith activationState:\(activationState) error:\(String(describing: error))")
-        debugPrint("WCSession.isPaired: \(session.isPaired), WCSession.isWatchAppInstalled: \(session.isWatchAppInstalled)")
+        if let error {
+            AppLog.connectivity.error("Watch session activation failed: \(error.localizedDescription, privacy: .public)")
+        } else {
+            AppLog.connectivity.info("Watch session activated with state \(activationState.rawValue), paired: \(session.isPaired), watch app installed: \(session.isWatchAppInstalled)")
+        }
     }
     
     func sessionDidBecomeInactive(_ session: WCSession) {
-        debugPrint("sessionDidBecomeInactive: \(session)")
+        AppLog.connectivity.info("Watch session became inactive")
     }
     
     func sessionDidDeactivate(_ session: WCSession) {
-        debugPrint("sessionDidDeactivate: \(session)")
+        AppLog.connectivity.info("Watch session deactivated; reactivating")
+        session.activate()
     }
     
     func sessionWatchStateDidChange(_ session: WCSession) {
-        debugPrint("sessionWatchStateDidChange: \(session)")
+        AppLog.connectivity.info("Watch state changed, paired: \(session.isPaired), watch app installed: \(session.isWatchAppInstalled)")
     }
     
     func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
         if let requestCanteenData = message["requestCanteenData"] as? Bool, requestCanteenData {
+            AppLog.connectivity.info("Received immediate canteen data request from watch")
             DispatchQueue.main.async {
                 self.refreshAndSendCanteenDataToWatch()
             }
@@ -100,6 +114,7 @@ extension WatchConnectivityHandler: WCSessionDelegate {
     
     func session(_ session: WCSession, didReceiveUserInfo userInfo: [String : Any] = [:]) {
         if let requestCanteenData = userInfo["requestCanteenData"] as? Bool, requestCanteenData {
+            AppLog.connectivity.info("Received queued canteen data request from watch")
             DispatchQueue.main.async {
                 self.refreshAndSendCanteenDataToWatch()
             }
